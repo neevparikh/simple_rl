@@ -203,6 +203,3 @@ class RMaxAgent(Agent):
         '''
 
         return self.transitions[state][action][next_state] / self.t_s_a_counts[state][action]
-
-
-

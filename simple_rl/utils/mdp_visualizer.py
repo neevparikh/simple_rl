@@ -2,7 +2,9 @@
 from __future__ import print_function
 import sys
 import time
+import os
 try:
+    os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
     import pygame
     from pygame.locals import *
     pygame.init()
@@ -35,10 +37,10 @@ def val_to_color(val, good_col=(169, 193, 249), bad_col=(249, 193, 169)):
 
     if val > 0:
         # Show positive as interpolated between white (0) and good_cal (1.0)
-        result = tuple([255 * (1 - val) + col * val for col in good_col])
+        result = tuple([255 * (1 - val) + (col * val) for col in good_col])
     else:
         # Show negative as interpolated between white (0) and bad_col (-1.0)
-        result = tuple([255 * (1 - abs(val)) + col * abs(val) for col in bad_col])
+        result = tuple([255 * (1 - abs(val)) + (col * abs(val)) for col in bad_col])
 
     return result
 
@@ -112,6 +114,22 @@ def visualize_policy(mdp, policy, draw_state, action_char_dict, cur_state=None, 
 
     agent_shape = _vis_init(screen, mdp, draw_state, cur_state, value=True)
     draw_state(screen, mdp, cur_state, policy=policy, action_char_dict=action_char_dict, show_value=False, draw_statics=True)
+    pygame.display.flip()
+    quit = False
+    while not quit:
+        # Check for key presses.
+        for event in pygame.event.get():
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                # Quit.
+                pygame.quit()
+                quit = True
+                break
+            if event.type == KEYDOWN and event.key == K_q:
+                pygame.quit()
+                sys.exit()
+            
+
+        time.sleep(0.1)
 
 def visualize_value(mdp, draw_state, cur_state=None, scr_width=720, scr_height=720):
     '''
@@ -130,6 +148,17 @@ def visualize_value(mdp, draw_state, cur_state=None, scr_width=720, scr_height=7
 
     agent_shape = _vis_init(screen, mdp, draw_state, cur_state, value=True)
     draw_state(screen, mdp, cur_state, show_value=True, draw_statics=True)
+    pygame.display.flip()
+
+    while True:
+        # Check for key presses.
+        for event in pygame.event.get():
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                # Quit.
+                pygame.quit()
+                sys.exit()
+
+        time.sleep(0.1)
 
 def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, scr_height=720, delay=0, num_ep=None, num_steps=None):
     '''
@@ -209,7 +238,6 @@ def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, sc
                 cur_state = mdp.get_init_state()
                 mdp.reset()
                 agent_shape = _vis_init(screen, mdp, draw_state, cur_state, agent, score=score)
-
     else:
         # Main loop.
         i = 0
@@ -252,6 +280,7 @@ def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, sc
             mdp.reset()
             agent_shape = _vis_init(screen, mdp, draw_state, cur_state, agent, score=score)
 
+    pygame.display.flip()
 
 
 def visualize_agent(mdp, agent, draw_state, cur_state=None, scr_width=720, scr_height=720):
@@ -300,7 +329,7 @@ def visualize_agent(mdp, agent, draw_state, cur_state=None, scr_width=720, scr_h
             screen.blit(goal_text_rendered, goal_text_point)
             done = True
 
-        pygame.display.update()
+        pygame.display.flip()
 
 def visualize_interaction(mdp, draw_state, cur_state=None, scr_width=720, scr_height=720):
     '''

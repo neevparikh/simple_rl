@@ -262,12 +262,19 @@ class QLearningAgent(Agent):
             self._anneal()
         Agent.end_of_episode(self)
 
+    def print_v_func(self):
+        '''
+        Summary:
+            Prints the V function.
+        '''
+        for state in self.q_func.keys():
+            print(state, self.get_value(state))
+
     def print_q_func(self):
         '''
         Summary:
             Prints the Q function.
         '''
-        
         if len(self.q_func) == 0:
             print("Q Func empty!")
         else:

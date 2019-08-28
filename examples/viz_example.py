@@ -26,6 +26,9 @@ def main():
     ql_agent = QLearningAgent(mdp.get_actions(), epsilon=0.2, alpha=0.2) 
     viz = parse_args()
 
+    # Choose viz type.
+    viz = "value"
+
     if viz == "value":
         # --> Color corresponds to higher value.
         # Run experiment and make plot.
@@ -49,7 +52,6 @@ def main():
     elif viz == "interactive":
         # Press <1>, <2>, <3>, and so on to execute action 1, action 2, etc.
     	mdp.visualize_interaction()
-
 
 if __name__ == "__main__":
     main()

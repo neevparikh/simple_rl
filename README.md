@@ -18,7 +18,19 @@ The easiest way to install is with [pip](https://pypi.python.org/pypi/pip). Just
 
 	pip install simple_rl
 
-Alternatively, you can download simple_rl [here](https://github.com/david-abel/simple_rl/tarball/v0.76).
+Alternatively, you can download simple_rl [here](https://github.com/david-abel/simple_rl/tarball/v0.811).
+
+## Citation
+
+If you use simple_rl in your research, please cite the [workshop paper](https://david-abel.github.io/papers/simple_rl.pdf) as follows:
+
+	@article{abel2019simple_rl,
+	  title={simple_rl: Reproducible Reinforcement Learning in Python},
+	  author={David Abel},
+	  booktitle={ICLR Workshop on Reproducibility in Machine Learning},
+	  year={2019}
+	}
+
 
 ## New Feature: Easy Reproduction of Results
 
