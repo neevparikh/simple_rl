@@ -22,7 +22,6 @@ from simple_rl.planning.ValueIterationClass import ValueIteration
 # An input function, creates the MDP object based on user input
 def generate_MDP(width, height, init_loc, goal_locs, lava_locs, gamma, walls, slip_prob):
     """ Creates an MDP object based on user input """
-
     actual_args = {
         "width": width, 
         "height": height, 
@@ -40,8 +39,18 @@ def generate_MDP(width, height, init_loc, goal_locs, lava_locs, gamma, walls, sl
 
 def main():
     # This accepts arguments from the command line with flags.
-    # Example usage: python value_iteration_demo.py -w 4 -H 3 -s 0.05 -g 0.95 -il [(0,0)] -gl [(4,3)] -ll [(4,2)]  -W [(2,2)]
-    parser = argparse.ArgumentParser(description='Run a demo that shows a visualization of value iteration on a GridWorld MDP')
+    # Example usage: python value_iteration_update_viz_example.py -w 7 -H 5 -s 0.05 -g 0.95 -il '(1,1)' -gl '[(7,4)]' -ll '[(7,3)]' -W '[(2,2)]'
+    parser = argparse.ArgumentParser(description='Run a demo that shows a visualization of value' +  
+                                                 'iteration on a GridWorld MDP. \n Notes: \n 1.' + 
+                                                 'Goal states should appear as green circles, lava' +  
+                                                 ' states should be red circles and the agent start' + 
+                                                 ' location should appear with a blue triangle. If' + 
+                                                 ' these are not shown, you have probably passed in' + 
+                                                 ' a value that is outside the grid \n 2.' + 
+                                                 'This program is intended to provide a visualization' +
+                                                 ' of Value Iteration after every iteration of the algorithm.' + 
+                                                 ' Once you pass in the correct arguments, a PyGame screen should pop-up.' +
+                                                 ' Press the esc key to view the next iteration and the q key to quit')
 
     # Add the relevant arguments to the argparser
     parser.add_argument('-w', '--width', type=int, nargs="?", const=4, default=4,
@@ -49,17 +58,17 @@ def main():
     parser.add_argument('-H', '--height', type=int, nargs="?", const=3, default=3,
     help='an integer representing the number of cells for the GridWorld height')
     parser.add_argument('-s', '--slip', type=float, nargs="?", const=0.05, default=0.05,
-    help='a float representing the probability that the agent will "slip" and not take the intended action')
+    help='a float representing the probability that the agent will "slip" and not take the intended action but take a random action at uniform instead')
     parser.add_argument('-g', '--gamma', type=float, nargs="?", const=0.95, default=0.95,
-    help='a float representing the decay probability for Value Iteration')
-    parser.add_argument('-il', '--i_loc', type=tuple, nargs="?", const=(0,0), default=(0,0),
-    help='two integers representing the starting cell location of the agent [with zero-indexing]')
+    help='a float representing the decay factor for Value Iteration')
+    parser.add_argument('-il', '--i_loc', type=ast.literal_eval, nargs="?", const=(1,1), default=(1,1),
+    help="a tuple of integers representing the starting cell location of the agent, with one-indexing. For example, do -il '(1,1)' , be sure to inclue apostrophes or argparse will fail!")
     parser.add_argument('-gl', '--g_loc', type=ast.literal_eval, nargs="?", const=[(3,3)], default=[(3,3)],
-    help='a sequence of integer-valued coordinates where the agent will receive a large reward and enter a terminal state')
+    help="a list of tuples of of integer-valued coordinates where the agent will receive a large reward and enter a terminal state. Each coordinate is a location on the grid with one-indexing. For example, do -gl '[(3,3)]' , be sure to inclue apostrophes or argparse will fail!")
     parser.add_argument('-ll', '--l_loc', type=ast.literal_eval, nargs="?", const=[(3,2)], default=[(3,2)],
-    help='a sequence of integer-valued coordinates where the agent will receive a large negative reward and enter a terminal state')
+    help="a list of tuples of of integer-valued coordinates where the agent will receive a large negative reward and enter a terminal state. Each coordinate is a location on the grid with one-indexing. For example, do -ll '[(3,2)]' , be sure to inclue apostrophes or argparse will fail!")
     parser.add_argument('-W', '--Walls', type=ast.literal_eval, nargs="?", const=[(2,2)], default=[(2,2)],
-    help='a sequence of integer-valued coordinates representing cells that the agent cannot transition into')
+    help="a list of tuples of of integer-valued coordinates where there are 'walls' that the agent can't transition into. Each coordinate is a location on the grid with one-indexing. For example, do -W '[(3,2)]' , be sure to inclue apostrophes or argparse will fail!")
     parser.add_argument('-d', '--delta', type=float, nargs="?", const=0.0001, default=0.0001,
     help='After an iteration if VI, if no change more than delta has occurred, terminates.')
     parser.add_argument('-m', '--max-iter', type=int, nargs="?", const=50, default=50,
