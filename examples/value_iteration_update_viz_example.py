@@ -15,8 +15,8 @@ from simple_rl.planning.ValueIterationClass import ValueIteration
 # INSTRUCTIONS FOR USE:
 # 1. When you run the program [either with default or supplied arguments], a pygame window should pop up.
 #    This is the first iteration of running VI on the given MDP.
-# 2. Press any button to close this pygame window and wait, another window will pop-up displaying the 
-#    policy from the next time step
+# 2. Press escape to close this pygame window and wait, another window will pop-up displaying the 
+#    policy from the next time step. Press q to exit. 
 # 3. Repeat 1 and 2 until the program terminates
 
 # An input function, creates the MDP object based on user input

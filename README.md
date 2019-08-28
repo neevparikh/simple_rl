@@ -91,6 +91,10 @@ Which will rerun the entire experiment, based on a file created and populated be
 
 Easy! This is a new feature, so there may be bugs -- just let me know as things come up. It's only supposed to work for MDPs, not POMDPs/OOMDPs/MarkovGameMDPs (so far). Take a look at [_reproduce_example.py_](https://github.com/david-abel/simple_rl/blob/master/examples/reproduce_example.py) for a bit more detail.
 
+### Value Iteration example
+
+Remember to press escape to advance to the next iteration and q to exit. 
+
 ## Overview
 
 * (_agents_): Code for some basic agents (a random actor, _Q_-learning, [[R-Max]](http://www.jmlr.org/papers/volume3/brafman02a/brafman02a.pdf), _Q_-learning with a Linear Approximator, and so on).
