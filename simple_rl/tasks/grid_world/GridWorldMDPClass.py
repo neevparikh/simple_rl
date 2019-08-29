@@ -50,6 +50,9 @@ class GridWorldMDP(MDP):
             is_goal_terminal (bool)
         '''
 
+        self.width = width
+        self.height = height
+
         # Setup init location.
         self.rand_init = rand_init
         if rand_init:
@@ -57,10 +60,6 @@ class GridWorldMDP(MDP):
             while init_loc in walls:
                 init_loc = random.randint(1, width), random.randint(1, height)
 
-        if not (init_loc[0] <= width and init_loc[0] > 0):
-            raise ValueError('Please ensure that the x coordinate of the init location is in the grid')
-        if not (init_loc[1] <= height and init_loc[1] > 0):
-            raise ValueError('Please ensure that the y coordinate of the init location is in the grid')
 
         self.init_loc = init_loc
         init_state = GridWorldState(init_loc[0], init_loc[1])
@@ -69,11 +68,12 @@ class GridWorldMDP(MDP):
 
         if type(goal_locs) is not list:
             raise ValueError("(simple_rl) GridWorld Error: argument @goal_locs needs to be a list of locations. For example: [(3,3), (4,3)].")
+        self._location_check([init_loc])
+        self._location_check(goal_locs)
+        self._location_check(lava_locs)
         self.step_cost = step_cost
         self.lava_cost = lava_cost
         self.walls = walls
-        self.width = width
-        self.height = height
         self.goal_locs = goal_locs
         self.cur_state = GridWorldState(init_loc[0], init_loc[1])
         self.is_goal_terminal = is_goal_terminal
@@ -81,6 +81,13 @@ class GridWorldMDP(MDP):
         self.slip_prob = slip_prob
         self.name = name
         self.lava_locs = lava_locs
+
+    def _location_check(self, locs):
+        for loc in locs:
+            if not (loc[0] <= self.width and loc[0] > 0):
+                raise ValueError('Please ensure that the x coordinate of the location is in the grid')
+            if not (loc[1] <= self.height and loc[1] > 0):
+                raise ValueError('Please ensure that the y coordinate of the location is in the grid')
 
     def get_parameters(self):
         '''
