@@ -13,6 +13,7 @@ else:
 
 # Other imports.
 from simple_rl.planning.PlannerClass import Planner
+from simple_rl.tasks.grid_world.GridWorldStateClass import GridWorldState
 
 class ValueIteration(Planner):
 
@@ -109,19 +110,7 @@ class ValueIteration(Planner):
         if self.reachability_done:
             return
 
-        state_queue = queue.Queue()
-        state_queue.put(self.init_state)
-        self.states.add(self.init_state)
-
-        while not state_queue.empty():
-            s = state_queue.get()
-            for a in self.actions:
-                for samples in range(self.sample_rate): # Take @sample_rate samples to estimate E[V]
-                    next_state = self.transition_func(s,a)
-
-                    if next_state not in self.states:
-                        self.states.add(next_state)
-                        state_queue.put(next_state)
+        self.states = set(self.mdp.get_all_agent_states())
 
         self.reachability_done = True
 
@@ -186,12 +175,14 @@ class ValueIteration(Planner):
         max_diff = float("inf")
         self._compute_matrix_from_trans_func()
         state_space = self.get_states()
+        print(state_space)
         self.bellman_backups = 0
 
         histories = []
 
         # Main loop.
         while max_diff > self.delta and iterations < self.max_iterations:
+            print(self.print_value_func())
             max_diff = 0
             for s in state_space:
                 self.bellman_backups += 1
@@ -204,6 +195,7 @@ class ValueIteration(Planner):
                     if(q_s_a > max_q):
                         max_q = q_s_a
                         self.max_q_act_histories[s] = a
+
 
                 # Check terminating condition.
                 max_diff = max(abs(self.value_func[s] - max_q), max_diff)

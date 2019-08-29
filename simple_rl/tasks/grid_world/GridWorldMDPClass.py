@@ -56,6 +56,12 @@ class GridWorldMDP(MDP):
             init_loc = random.randint(1, width), random.randint(1, height)
             while init_loc in walls:
                 init_loc = random.randint(1, width), random.randint(1, height)
+
+        if not (init_loc[0] <= width and init_loc[0] > 0):
+            raise ValueError('Please ensure that the x coordinate of the init location is in the grid')
+        if not (init_loc[1] <= height and init_loc[1] > 0):
+            raise ValueError('Please ensure that the y coordinate of the init location is in the grid')
+
         self.init_loc = init_loc
         init_state = GridWorldState(init_loc[0], init_loc[1])
 
@@ -229,6 +235,16 @@ class GridWorldMDP(MDP):
         '''
 
         return (x, y) in self.walls
+
+    def get_all_agent_states(self):
+        ''' Returns all Grid world states '''
+        states = []
+        for x in range(1,self.width+1):
+            for y in range(1,self.height+1):
+                state = GridWorldState(x,y)
+                if not self.is_wall(x,y):
+                    states.append(state)
+        return states
 
     def __str__(self):
         return self.name + "_h-" + str(self.height) + "_w-" + str(self.width)
