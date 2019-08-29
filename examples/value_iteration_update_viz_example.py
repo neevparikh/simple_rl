@@ -50,7 +50,9 @@ def main():
                                                  'This program is intended to provide a visualization' +
                                                  ' of Value Iteration after every iteration of the algorithm.' + 
                                                  ' Once you pass in the correct arguments, a PyGame screen should pop-up.' +
-                                                 ' Press the esc key to view the next iteration and the q key to quit')
+                                                 ' Press the esc key to view the next iteration and the q key to quit' + 
+                                                 '\n 3. The program prints the total time taken for VI to run in seconds ' + 
+                                                 ' and the number of iterations (as the history) to the console.')
 
     # Add the relevant arguments to the argparser
     parser.add_argument('-w', '--width', type=int, nargs="?", const=4, default=4,
