@@ -80,6 +80,17 @@ def _draw_state(screen,
                 top_left_point = width_buffer + cell_width*i, height_buffer + cell_height*j
                 r = pygame.draw.rect(screen, (46, 49, 49), top_left_point + (cell_width, cell_height), 3)
 
+                # Current state.
+                if show_value and (i+1,grid_mdp.height - j) == (state.x, state.y) and agent_shape is None:
+                    tri_center = int(top_left_point[0] + cell_width/2.0), int(top_left_point[1] + cell_height/2.0)
+                    agent_shape = _draw_agent(tri_center, screen, base_size=min(cell_width, cell_height)/2.5 - 10)
+
+                if show_value and not grid_mdp.is_wall(i+1, grid_mdp.height - j):
+                    # Draw the value.
+                    val = val_text_dict[i+1][grid_mdp.height - j]
+                    color = mdpv.val_to_color(val)
+                    pygame.draw.rect(screen, color, top_left_point + (cell_width, cell_height), 0)
+
                 if policy and not grid_mdp.is_wall(i+1, grid_mdp.height - j):
                     a = policy_dict[i+1][grid_mdp.height - j]
                     if a not in action_char_dict:
@@ -90,12 +101,6 @@ def _draw_state(screen,
                     text_rendered_a = cc_font.render(text_a, True, (46, 49, 49))
                     screen.blit(text_rendered_a, text_center_point)
 
-                if show_value and not grid_mdp.is_wall(i+1, grid_mdp.height - j):
-                    # Draw the value.
-                    val = val_text_dict[i+1][grid_mdp.height - j]
-                    color = mdpv.val_to_color(val)
-                    pygame.draw.rect(screen, color, top_left_point + (cell_width, cell_height), 0)
-
                 if grid_mdp.is_wall(i+1, grid_mdp.height - j):
                     # Draw the walls.
                     top_left_point = width_buffer + cell_width*i + 5, height_buffer + cell_height*j + 5
@@ -105,7 +110,7 @@ def _draw_state(screen,
                     # Draw goal.
                     circle_center = int(top_left_point[0] + cell_width/2.0), int(top_left_point[1] + cell_height/2.0)
                     circler_color = (154, 195, 157)
-                    pygame.draw.circle(screen, circler_color, circle_center, int(min(cell_width, cell_height) / 3.0))
+                    pygame.draw.circle(screen, circler_color, circle_center, int(min(cell_width, cell_height) / 4.0))
 
                 if (i+1,grid_mdp.height - j) in lava_locs:
                     # Draw goal.
@@ -113,26 +118,23 @@ def _draw_state(screen,
                     circler_color = (224, 145, 157)
                     pygame.draw.circle(screen, circler_color, circle_center, int(min(cell_width, cell_height) / 4.0))
 
+
                 if show_value and not grid_mdp.is_wall(i+1, grid_mdp.height - j):
                     # Write value text to each state.
                     value_text = reg_font.render(str(round(val, 2)), True, (46, 49, 49))
-                    text_center_point = int(top_left_point[0] + cell_width/2.0 - 10), int(top_left_point[1] + cell_height/3.0)
+                    text_center_point = int(top_left_point[0] + cell_width/14.0), int(top_left_point[1] + cell_height/11.0)
                     screen.blit(value_text, text_center_point)
 
 
-                # Current state.
-                if show_value and (i+1,grid_mdp.height - j) == (state.x, state.y) and agent_shape is None:
-                    tri_center = int(top_left_point[0] + cell_width/2.0), int(top_left_point[1] + cell_height/2.0)
-                    agent_shape = _draw_agent(tri_center, screen, base_size=min(cell_width, cell_height)/2.5 - 8)
 
     if agent_shape is not None:
         # Clear the old shape.
-        pygame.draw.rect(screen, (255,255,255), agent_shape)
+        # pygame.draw.rect(screen, (255,255,255), agent_shape, 1)
         top_left_point = width_buffer + cell_width*(state.x - 1), height_buffer + cell_height*(grid_mdp.height - state.y)
         tri_center = int(top_left_point[0] + cell_width/2.0), int(top_left_point[1] + cell_height/2.0)
 
         # Draw new.
-        agent_shape = _draw_agent(tri_center, screen, base_size=min(cell_width, cell_height)/2.5 - 8)
+        agent_shape = _draw_agent(tri_center, screen, base_size=min(cell_width, cell_height)/2.5 - 10)
 
     pygame.display.flip()
 

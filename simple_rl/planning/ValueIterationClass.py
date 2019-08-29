@@ -175,14 +175,12 @@ class ValueIteration(Planner):
         max_diff = float("inf")
         self._compute_matrix_from_trans_func()
         state_space = self.get_states()
-        print(state_space)
         self.bellman_backups = 0
 
         histories = []
 
         # Main loop.
         while max_diff > self.delta and iterations < self.max_iterations:
-            print(self.print_value_func())
             max_diff = 0
             for s in state_space:
                 self.bellman_backups += 1
