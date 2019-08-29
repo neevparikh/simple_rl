@@ -71,7 +71,7 @@ def main():
     help="a list of tuples of of integer-valued coordinates where there are 'walls' that the agent can't transition into. Each coordinate is a location on the grid with one-indexing. For example, do -W '[(3,2)]' , be sure to inclue apostrophes or argparse will fail!")
     parser.add_argument('-d', '--delta', type=float, nargs="?", const=0.0001, default=0.0001,
     help='After an iteration if VI, if no change more than delta has occurred, terminates.')
-    parser.add_argument('-m', '--max-iter', type=int, nargs="?", const=50, default=50,
+    parser.add_argument('-m', '--max-iter', type=int, nargs="?", const=500, default=500,
     help='Maximum number of iterations VI runs for')
 
     args = parser.parse_args()
