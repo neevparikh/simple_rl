@@ -94,8 +94,9 @@ def main():
     print('Took {:.4f} seconds'.format(end-st))
 
     # For every value backup, visualize the policy
+    num_hist = len(histories)
     for i, value_dict in enumerate(histories):
-        print('Showing history {:04d}'.format(i), end='\r')
+        print('Showing history {:04d} of {:04d}'.format(i+1, num_hist))
         mdp.visualize_policy(lambda in_state: value_dict[in_state]) # Note: This lambda is necessary because the policy must be a function
 
 if __name__ == "__main__":
