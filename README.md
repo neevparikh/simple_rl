@@ -13,12 +13,18 @@ simple_rl requires [numpy](http://www.numpy.org/) and [matplotlib](http://matplo
 [Documentation available here](https://david-abel.github.io/simple_rl/docs/index.html)
 
 ## Installation
+Please perform the following steps:
+1. Clone this repository to your local computer
+2. Install dependencies
+ a) numpy
+ b) matplotlib
+ c) pygame
+ d) tkinter (install from package manager: sudo apt install python3-tk)
+4. Run `pip install .` from root folder
+5. Run `python simple_rl/run_experiments.py` from root folder
 
-The easiest way to install is with [pip](https://pypi.python.org/pypi/pip). Just run:
+If the run_experiments script works, then your install is all good to go! Otherwise, please try again or contact us!
 
-	pip install simple_rl
-
-Alternatively, you can download simple_rl [here](https://github.com/david-abel/simple_rl/tarball/v0.811).
 
 ## Citation
 
