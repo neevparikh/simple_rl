@@ -29,8 +29,8 @@ class GridWorldMDP(MDP):
                 height=3,
                 init_loc=(1, 1),
                 rand_init=False,
-                goal_locs=[()],
-                lava_locs=[()],
+                goal_locs=[], # pass in tuple in list
+                lava_locs=[], # pass in tuple in list
                 walls=[],
                 is_goal_terminal=True,
                 is_lava_terminal=False,
@@ -90,8 +90,7 @@ class GridWorldMDP(MDP):
                 if not (loc[1] <= self.height and loc[1] > 0):
                     raise ValueError('Please ensure that the y coordinate of the location is in the grid')
             except IndexError:
-                if len(locs) == 0:
-                    print('Warning: empty list for location')
+                print('Warning: empty tuple passed in list for location')
 
     def get_parameters(self):
         '''
