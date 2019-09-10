@@ -84,10 +84,14 @@ class GridWorldMDP(MDP):
 
     def _location_check(self, locs):
         for loc in locs:
-            if not (loc[0] <= self.width and loc[0] > 0):
-                raise ValueError('Please ensure that the x coordinate of the location is in the grid')
-            if not (loc[1] <= self.height and loc[1] > 0):
-                raise ValueError('Please ensure that the y coordinate of the location is in the grid')
+            try:
+                if not (loc[0] <= self.width and loc[0] > 0):
+                    raise ValueError('Please ensure that the x coordinate of the location is in the grid')
+                if not (loc[1] <= self.height and loc[1] > 0):
+                    raise ValueError('Please ensure that the y coordinate of the location is in the grid')
+            except IndexError:
+                if len(locs) == 0:
+                    print('Warning: empty list for location')
 
     def get_parameters(self):
         '''

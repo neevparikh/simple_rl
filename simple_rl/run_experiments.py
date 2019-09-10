@@ -619,7 +619,7 @@ def choose_mdp(mdp_name, env_name="Asteroids-v0"):
             raise ValueError("(simple_rl) Error: OpenAI gym not installed.")
         return GymMDP(env_name, render=True)
     else:
-        return {"grid":GridWorldMDP(5, 5, (1, 1), goal_locs=[(5, 3), (4,1)]),
+        return {"grid":GridWorldMDP(6, 6, (1, 1), goal_locs=[(5, 3), (4,1)]),
                 "four_room":FourRoomMDP(),
                 "chain":ChainMDP(5),
                 "taxi":TaxiOOMDP(10, 10, slip_prob=0.0, agent=agent, walls=walls, passengers=passengers),
