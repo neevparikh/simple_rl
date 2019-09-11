@@ -40,6 +40,7 @@ def generate_MDP(width, height, init_loc, goal_locs, lava_locs, gamma, walls, sl
 def main():
     # This accepts arguments from the command line with flags.
     # Example usage: python value_iteration_update_viz_example.py -w 7 -H 5 -s 0.05 -g 0.95 -il '(1,1)' -gl '[(7,4)]' -ll '[(7,3)]' -W '[(2,2)]'
+    # Examples WINDOWS Usage: python value_iteration_update_viz_example.py -w 7 -H 5 -s 0.05 -g 0.95 -il (1,1) -gl [(7,4)] -ll [(7,3)] -W [(2,2)]
     parser = argparse.ArgumentParser(description='Run a demo that shows a visualization of value' +  
                                                  'iteration on a GridWorld MDP. \n Notes: \n 1.' + 
                                                  'Goal states should appear as green circles, lava' +  
@@ -64,13 +65,13 @@ def main():
     parser.add_argument('-g', '--gamma', type=float, nargs="?", const=0.95, default=0.95,
     help='a float representing the decay factor for Value Iteration')
     parser.add_argument('-il', '--i_loc', type=ast.literal_eval, nargs="?", const=(1,1), default=(1,1),
-    help="a tuple of integers representing the starting cell location of the agent, with one-indexing. For example, do -il '(1,1)' , be sure to inclue apostrophes or argparse will fail!")
+    help="a tuple of integers representing the starting cell location of the agent, with one-indexing. For example, do -il '(1,1)' , be sure to include apostrophes (unless you use Windows) or argparse will fail!")
     parser.add_argument('-gl', '--g_loc', type=ast.literal_eval, nargs="?", const=[(3,3)], default=[(3,3)],
-    help="a list of tuples of of integer-valued coordinates where the agent will receive a large reward and enter a terminal state. Each coordinate is a location on the grid with one-indexing. For example, do -gl '[(3,3)]' , be sure to inclue apostrophes or argparse will fail!")
+    help="a list of tuples of of integer-valued coordinates where the agent will receive a large reward and enter a terminal state. Each coordinate is a location on the grid with one-indexing. For example, do -gl '[(3,3)]' , be sure to include apostrophes (unless you use Windows) or argparse will fail!")
     parser.add_argument('-ll', '--l_loc', type=ast.literal_eval, nargs="?", const=[(3,2)], default=[(3,2)],
-    help="a list of tuples of of integer-valued coordinates where the agent will receive a large negative reward and enter a terminal state. Each coordinate is a location on the grid with one-indexing. For example, do -ll '[(3,2)]' , be sure to inclue apostrophes or argparse will fail!")
+    help="a list of tuples of of integer-valued coordinates where the agent will receive a large negative reward and enter a terminal state. Each coordinate is a location on the grid with one-indexing. For example, do -ll '[(3,2)]' , be sure to include apostrophes (unless you use Windows) or argparse will fail!")
     parser.add_argument('-W', '--Walls', type=ast.literal_eval, nargs="?", const=[(2,2)], default=[(2,2)],
-    help="a list of tuples of of integer-valued coordinates where there are 'walls' that the agent can't transition into. Each coordinate is a location on the grid with one-indexing. For example, do -W '[(3,2)]' , be sure to inclue apostrophes or argparse will fail!")
+    help="a list of tuples of of integer-valued coordinates where there are 'walls' that the agent can't transition into. Each coordinate is a location on the grid with one-indexing. For example, do -W '[(3,2)]' , be sure to include apostrophes (unless you use Windows) or argparse will fail!")
     parser.add_argument('-d', '--delta', type=float, nargs="?", const=0.0001, default=0.0001,
     help='After an iteration if VI, if no change more than delta has occurred, terminates.')
     parser.add_argument('-m', '--max-iter', type=int, nargs="?", const=500, default=500,
