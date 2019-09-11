@@ -109,8 +109,21 @@ class ValueIteration(Planner):
 
         if self.reachability_done:
             return
+        state_queue = queue.Queue()
+        state_queue.put(self.init_state)
+        self.states.add(self.init_state)
 
-        self.states = set(self.mdp.get_all_agent_states())
+        while not state_queue.empty():
+            s = state_queue.get()
+            for a in self.actions:
+                # Take @sample_rate samples to estimate E[V]
+                for _ in range(self.sample_rate): 
+                    next_state = self.transition_func(s,a)
+                    if next_state not in self.states:
+                        self.states.add(next_state)
+                        state_queue.put(next_state)
+
+        # self.states = set(self.mdp.get_all_agent_states())
 
         self.reachability_done = True
 
