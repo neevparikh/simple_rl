@@ -252,6 +252,8 @@ class GridWorldMDP(MDP):
         for x in range(1,self.width+1):
             for y in range(1,self.height+1):
                 state = GridWorldState(x,y)
+                if ((x,y) in self.goal_locs) or ((x,y) in self.lava_locs):
+                    state._is_terminal = True
                 if not self.is_wall(x,y):
                     states.append(state)
         return states
