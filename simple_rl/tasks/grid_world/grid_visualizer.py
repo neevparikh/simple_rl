@@ -53,10 +53,11 @@ def _draw_state(screen,
     # Make policy dict.
     policy_dict = defaultdict(lambda : defaultdict(str))
     if policy:
-        vi = ValueIteration(grid_mdp)
-        vi.run_vi()
-        for s in vi.get_states():
-            policy_dict[s.x][s.y] = policy(s)
+        pass
+        # vi = ValueIteration(grid_mdp)
+        # vi.run_vi()
+        # for s in vi.get_states():
+        #     policy_dict[s.x][s.y] = policy(s)
 
     # Prep some dimensions to make drawing easier.
     scr_width, scr_height = screen.get_width(), screen.get_height()

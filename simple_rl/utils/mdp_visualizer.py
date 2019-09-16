@@ -126,8 +126,7 @@ def visualize_policy(mdp, policy, draw_state, action_char_dict, cur_state=None, 
                 break
             if event.type == KEYDOWN and event.key == K_q:
                 pygame.quit()
-                sys.exit()
-            
+                sys.exit()            
 
         time.sleep(0.1)
 
@@ -281,7 +280,6 @@ def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, sc
             agent_shape = _vis_init(screen, mdp, draw_state, cur_state, agent, score=score)
 
     pygame.display.flip()
-
 
 def visualize_agent(mdp, agent, draw_state, cur_state=None, scr_width=720, scr_height=720):
     '''

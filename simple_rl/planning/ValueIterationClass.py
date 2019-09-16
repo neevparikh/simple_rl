@@ -1,29 +1,32 @@
 # Python imports.
 from __future__ import print_function
+from simple_rl.tasks.grid_world.GridWorldStateClass import GridWorldState
+from simple_rl.planning.PlannerClass import Planner
 from collections import defaultdict
 import random
-import copy 
+import math
+import copy
 
 # Check python version for queue module.
 import sys
 if sys.version_info[0] < 3:
-	import Queue as queue
+    import Queue as queue
 else:
-	import queue
+    import queue
 
-# Other imports.
-from simple_rl.planning.PlannerClass import Planner
-from simple_rl.tasks.grid_world.GridWorldStateClass import GridWorldState
 
 class ValueIteration(Planner):
 
-    def __init__(self, mdp, name="value_iter", delta=0.0001, max_iterations=500, sample_rate=3):
+    def __init__(self, mdp, name="value_iter", delta=0.0001, max_iterations=500,
+                 sample_rate=3):
         '''
         Args:
             mdp (MDP)
-            delta (float): After an iteration if VI, if no change more than @\delta has occurred, terminates.
+            delta (float): After an iteration if VI, if no change more than @\delta has
+                occurred, terminates.
             max_iterations (int): Hard limit for number of iterations.
-            sample_rate (int): Determines how many samples from @mdp to take to estimate T(s' | s, a).
+            sample_rate (int): Determines how many samples from @mdp to take to estimate 
+                T(s' | s, a).
             horizon (int): Number of steps before terminating.
         '''
         Planner.__init__(self, mdp, name=name)
@@ -36,7 +39,8 @@ class ValueIteration(Planner):
         self.reachability_done = False
         self.has_computed_matrix = False
         self.bellman_backups = 0
-        self.trans_dict = defaultdict(lambda:defaultdict(lambda:defaultdict(float)))
+        self.trans_dict = defaultdict(
+            lambda: defaultdict(lambda: defaultdict(float)))
 
     def _compute_matrix_from_trans_func(self):
         if self.has_computed_matrix:
@@ -45,9 +49,9 @@ class ValueIteration(Planner):
             return
 
             # K: state
-                # K: a
-                    # K: s_prime
-                    # V: prob
+            # K: a
+            # K: s_prime
+            # V: prob
 
         for s in self.get_states():
             for a in self.actions:
@@ -95,9 +99,11 @@ class ValueIteration(Planner):
         expected_future_val = 0
         for s_prime in self.trans_dict[s][a].keys():
             if not s.is_terminal():
-                expected_future_val += self.trans_dict[s][a][s_prime] * self.reward_func(s, a, s_prime) + \
-                                       self.gamma * self.trans_dict[s][a][s_prime] * self.value_func[s_prime]
-                
+                expected_future_val += self.trans_dict[s][a][s_prime] * \
+                    self.reward_func(s, a, s_prime) + \
+                    self.gamma * \
+                    self.trans_dict[s][a][s_prime] * self.value_func[s_prime]
+
         return expected_future_val
 
     def _compute_reachable_state_space(self):
@@ -154,7 +160,8 @@ class ValueIteration(Planner):
                 self.value_func[s] = max_q
             iterations += 1
 
-        value_of_init_state = self._compute_max_qval_action_pair(self.init_state)[0]
+        value_of_init_state = self._compute_max_qval_action_pair(self.init_state)[
+            0]
         self.has_planned = True
 
         return iterations, value_of_init_state
@@ -184,7 +191,7 @@ class ValueIteration(Planner):
             max_diff = 0
             for s in state_space:
                 self.bellman_backups += 1
-                if s.is_terminal():                    
+                if s.is_terminal():
                     continue
 
                 max_q = float("-inf")
@@ -194,17 +201,21 @@ class ValueIteration(Planner):
                         max_q = q_s_a
                         self.max_q_act_histories[s] = a
 
-
                 # Check terminating condition.
                 max_diff = max(abs(self.value_func[s] - max_q), max_diff)
+                if math.isnan(max_diff):
+                    max_diff = float("inf")
 
                 # Update value.
                 self.value_func[s] = max_q
+                print(self.value_func[s], s)
+            print(max_diff > self.delta, max_diff)
 
             histories.append(copy.deepcopy(self.max_q_act_histories))
             iterations += 1
 
-        value_of_init_state = self._compute_max_qval_action_pair(self.init_state)[0]
+        value_of_init_state = self._compute_max_qval_action_pair(self.init_state)[
+            0]
         self.has_planned = True
 
         return iterations, value_of_init_state, histories

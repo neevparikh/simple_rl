@@ -63,7 +63,6 @@ class GridWorldMDP(MDP):
 
         self.init_loc = init_loc
         init_state = GridWorldState(init_loc[0], init_loc[1])
-
         MDP.__init__(self, GridWorldMDP.ACTIONS, self._transition_func, self._reward_func, init_state=init_state, gamma=gamma)
 
         if type(goal_locs) is not list:
