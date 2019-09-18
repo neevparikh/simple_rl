@@ -94,16 +94,16 @@ def main():
     # Run value iteration on the mdp and save the history of value backups until convergence
     st = time.time()
     vi = ValueIteration(mdp, max_iterations=args.max_iter, delta=args.delta)
-    num_hist, _, histories = vi.run_vi_histories()
+    num_hist, _, q_act_histories, val_histories = vi.run_vi_histories()
     end = time.time()
 
     print('Took {:.4f} seconds'.format(end-st))
 
     # For every value backup, visualize the policy
-    for i, value_dict in enumerate(histories):
+    for i, action_dict in enumerate(q_act_histories):
         print('Showing history {:04d} of {:04d}'.format(i+1, num_hist))
         # Note: This lambda is necessary because the policy must be a function
-        mdp.visualize_policy(lambda in_state: value_dict[in_state])
+        mdp.visualize_policy_values((lambda in_state: action_dict[in_state]), (lambda curr_state: val_histories[curr_state]))
 
 
 if __name__ == "__main__":
