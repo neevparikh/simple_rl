@@ -184,7 +184,8 @@ class ValueIteration(Planner):
         state_space = self.get_states()
         self.bellman_backups = 0
 
-        histories = []
+        q_act_histories = []
+        value_histories = []
 
         # Main loop.
         while max_diff > self.delta and iterations < self.max_iterations:
@@ -208,17 +209,16 @@ class ValueIteration(Planner):
 
                 # Update value.
                 self.value_func[s] = max_q
-                print(self.value_func[s], s)
-            print(max_diff > self.delta, max_diff)
 
-            histories.append(copy.deepcopy(self.max_q_act_histories))
+            q_act_histories.append(copy.deepcopy(self.max_q_act_histories))
+            value_histories.append(copy.deepcopy(self.value_func))
             iterations += 1
 
         value_of_init_state = self._compute_max_qval_action_pair(self.init_state)[
             0]
         self.has_planned = True
 
-        return iterations, value_of_init_state, histories
+        return iterations, value_of_init_state, q_act_histories, value_histories
 
     def get_num_backups_in_recent_run(self):
         if self.has_planned:

@@ -130,6 +130,43 @@ def visualize_policy(mdp, policy, draw_state, action_char_dict, cur_state=None, 
 
         time.sleep(0.1)
 
+def visualize_policy_values(mdp, policy, value_mapping, draw_state, action_char_dict, cur_state=None, scr_width=720, scr_height=720):
+    '''
+    Args:
+        mdp (MDP)
+        policy (lambda: S --> A)
+        draw_state (lambda)
+        action_char_dict (dict):
+            Key: action
+            Val: str
+        cur_state (State)
+
+    Summary:
+
+    '''
+    screen = pygame.display.set_mode((scr_width, scr_height))
+
+    # Setup and draw initial state.
+    cur_state = mdp.get_init_state() if cur_state is None else cur_state
+
+    agent_shape = _vis_init(screen, mdp, draw_state, cur_state, value=True)
+    draw_state(screen, mdp, cur_state, policy=policy, values=value_mapping, action_char_dict=action_char_dict, show_value=False, draw_statics=True)
+    pygame.display.flip()
+    quit = False
+    while not quit:
+        # Check for key presses.
+        for event in pygame.event.get():
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                # Quit.
+                pygame.quit()
+                quit = True
+                break
+            if event.type == KEYDOWN and event.key == K_q:
+                pygame.quit()
+                sys.exit()            
+
+        time.sleep(0.1)
+
 def visualize_value(mdp, draw_state, cur_state=None, scr_width=720, scr_height=720):
     '''
     Args:
@@ -299,7 +336,7 @@ def visualize_agent(mdp, agent, draw_state, cur_state=None, scr_width=720, scr_h
     # Setup and draw initial state.
     cur_state = mdp.get_init_state() if cur_state is None else cur_state
     reward = 0
-    agent_shape = _vis_init(screen, mdp, draw_state, cur_state, agent)
+    agent_shape = _vis_init(screen=screen, mdp=mdp, draw_state=draw_state, cur_state=cur_state, agent=agent)
 
     done = False
     while not done:

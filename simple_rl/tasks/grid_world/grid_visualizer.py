@@ -18,6 +18,7 @@ def _draw_state(screen,
                 grid_mdp,
                 state,
                 policy=None,
+                value=None,
                 action_char_dict={},
                 show_value=True,
                 agent=None,
@@ -44,20 +45,27 @@ def _draw_state(screen,
             for s in agent.q_func.keys():
                 val_text_dict[s.x][s.y] = agent.get_value(s)
         else:
-            # Use Value Iteration to compute value.
-            vi = ValueIteration(grid_mdp, sample_rate=10)
-            vi.run_vi()
-            for s in vi.get_states():
-                val_text_dict[s.x][s.y] = vi.get_value(s)
+            if value:
+                vi = ValueIteration(grid_mdp, sample_rate=10)
+                vi.run_vi()
+                for s in vi.get_states():
+                    val_text_dict[s.x][s.y] = value[s]
+                    print("VALUES")
+            else:
+                # Use Value Iteration to compute value.
+                vi = ValueIteration(grid_mdp, sample_rate=50)
+                vi.run_vi()
+                for s in vi.get_states():
+                    val_text_dict[s.x][s.y] = vi.get_value(s)
 
     # Make policy dict.
     policy_dict = defaultdict(lambda : defaultdict(str))
     if policy:
-        pass
-        # vi = ValueIteration(grid_mdp)
-        # vi.run_vi()
-        # for s in vi.get_states():
-        #     policy_dict[s.x][s.y] = policy(s)
+#        pass
+        vi = ValueIteration(grid_mdp)
+        vi.run_vi()
+        for s in vi.get_states():
+            policy_dict[s.x][s.y] = policy(s)
 
     # Prep some dimensions to make drawing easier.
     scr_width, scr_height = screen.get_width(), screen.get_height()
