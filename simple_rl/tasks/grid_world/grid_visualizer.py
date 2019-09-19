@@ -47,7 +47,7 @@ def _draw_state(screen,
         else:
             if value:
                 vi = ValueIteration(grid_mdp, sample_rate=10)
-                vi.run_vi()
+#                vi.run_vi()
                 for s in vi.get_states():
                     val_text_dict[s.x][s.y] = value(s)
             else:
@@ -62,7 +62,7 @@ def _draw_state(screen,
     if policy:
 #        pass
         vi = ValueIteration(grid_mdp)
-        vi.run_vi()
+#        vi.run_vi()
         for s in vi.get_states():
             policy_dict[s.x][s.y] = policy(s)
 

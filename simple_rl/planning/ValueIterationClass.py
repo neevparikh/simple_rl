@@ -18,7 +18,7 @@ else:
 class ValueIteration(Planner):
 
     def __init__(self, mdp, name="value_iter", delta=0.0001, max_iterations=500,
-                 sample_rate=3):
+                 sample_rate=1000):
         '''
         Args:
             mdp (MDP)
