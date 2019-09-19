@@ -103,7 +103,7 @@ def main():
     for i, action_dict in enumerate(q_act_histories):
         print('Showing history {:04d} of {:04d}'.format(i+1, num_hist))
         # Note: This lambda is necessary because the policy must be a function
-        mdp.visualize_policy_values((lambda in_state: action_dict[in_state]), (lambda curr_state: val_histories[curr_state]))
+        mdp.visualize_policy_values((lambda in_state: action_dict[in_state]), (lambda curr_state: val_histories[i][curr_state]))
 
 
 if __name__ == "__main__":

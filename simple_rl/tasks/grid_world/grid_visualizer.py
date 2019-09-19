@@ -49,8 +49,7 @@ def _draw_state(screen,
                 vi = ValueIteration(grid_mdp, sample_rate=10)
                 vi.run_vi()
                 for s in vi.get_states():
-                    val_text_dict[s.x][s.y] = value[s]
-                    print("VALUES")
+                    val_text_dict[s.x][s.y] = value(s)
             else:
                 # Use Value Iteration to compute value.
                 vi = ValueIteration(grid_mdp, sample_rate=50)
@@ -148,7 +147,6 @@ def _draw_state(screen,
     pygame.display.flip()
 
     return agent_shape
-
 
 def _draw_agent(center_point, screen, base_size=20):
     '''

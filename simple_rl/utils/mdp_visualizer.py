@@ -149,8 +149,8 @@ def visualize_policy_values(mdp, policy, value_mapping, draw_state, action_char_
     # Setup and draw initial state.
     cur_state = mdp.get_init_state() if cur_state is None else cur_state
 
-    agent_shape = _vis_init(screen, mdp, draw_state, cur_state, value=True)
-    draw_state(screen, mdp, cur_state, policy=policy, values=value_mapping, action_char_dict=action_char_dict, show_value=False, draw_statics=True)
+    agent_shape = _vis_init(screen, mdp, draw_state, cur_state, value=value_mapping)
+    draw_state(screen, mdp, cur_state, policy=policy, value=value_mapping, action_char_dict=action_char_dict, show_value=False, draw_statics=True)
     pygame.display.flip()
     quit = False
     while not quit:
@@ -417,7 +417,7 @@ def visualize_interaction(mdp, draw_state, cur_state=None, scr_width=720, scr_he
 
         pygame.display.update()
 
-def _vis_init(screen, mdp, draw_state, cur_state, agent=None, value=False, score=-1):
+def _vis_init(screen, mdp, draw_state, cur_state, agent=None, value=None, score=-1):
     # Pygame setup.
     pygame.init()
     screen.fill((255, 255, 255))
@@ -426,7 +426,7 @@ def _vis_init(screen, mdp, draw_state, cur_state, agent=None, value=False, score
 
     if score != -1:
         _draw_lower_left_text("Score: " + str(score), screen)
-    agent_shape = draw_state(screen, mdp, cur_state, agent=agent, show_value=True, draw_statics=True)
+    agent_shape = draw_state(screen=screen, grid_mdp=mdp, value=value, state=cur_state, agent=agent, show_value=True, draw_statics=True)
 
     return agent_shape
 

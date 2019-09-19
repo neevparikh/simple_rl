@@ -293,7 +293,7 @@ class GridWorldMDP(MDP):
             "right":">",    #u"\u2192"
         }
 
-        mdpv.visualize_policy(self, policy, value_mapping, _draw_state, action_char_dict)
+        mdpv.visualize_policy_values(self, policy, value_mapping, _draw_state, action_char_dict)
 
     def visualize_agent(self, agent):
         from simple_rl.utils import mdp_visualizer as mdpv
