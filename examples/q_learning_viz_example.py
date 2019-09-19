@@ -31,13 +31,13 @@ def parse_args():
 def main():
 
     # Setup MDP, Agents.
-    mdp = GridWorldMDP(width=5,
-                       height=5,
+    mdp = GridWorldMDP(width=3,
+                       height=3,
                        init_loc=(1, 1),
-                       goal_locs=[(5, 5)],
-                       lava_locs=[(4, 2)],
+                       goal_locs=[(3, 3)],
+                       lava_locs=[(2, 2)],
                        gamma=0.95,
-                       walls=[(2, 2)],
+                       walls=[(1, 2)],
                        slip_prob=0.1)
     ql_agent = QLearningAgent(mdp.get_actions(), epsilon=0.95, alpha=0.2)
     viz = parse_args()
