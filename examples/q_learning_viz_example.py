@@ -31,10 +31,10 @@ def parse_args():
 def main():
 
     # Setup MDP, Agents.
-    mdp = GridWorldMDP(width=7,
-                       height=7,
+    mdp = GridWorldMDP(width=5,
+                       height=5,
                        init_loc=(1, 1),
-                       goal_locs=[(7, 7)],
+                       goal_locs=[(5, 5)],
                        lava_locs=[(4, 2)],
                        gamma=0.95,
                        walls=[(2, 2)],
