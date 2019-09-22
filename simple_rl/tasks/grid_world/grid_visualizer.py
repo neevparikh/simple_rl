@@ -96,6 +96,10 @@ def _draw_state(screen,
                 if show_value and not grid_mdp.is_wall(i+1, grid_mdp.height - j):
                     # Draw the value.
                     val = val_text_dict[i+1][grid_mdp.height - j]
+                    if (i+1, grid_mdp.height - j) in goal_locs:
+                        val = 1 
+                    if (i+1, grid_mdp.height - j) in lava_locs:
+                        val = -grid_mdp.lava_cost 
                     color = mdpv.val_to_color(val)
                     pygame.draw.rect(screen, color, top_left_point + (cell_width, cell_height), 0)
 

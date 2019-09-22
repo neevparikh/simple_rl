@@ -33,7 +33,7 @@ class GridWorldMDP(MDP):
                 lava_locs=[], # pass in tuple in list
                 walls=[],
                 is_goal_terminal=True,
-                is_lava_terminal=False,
+                is_lava_terminal=True,
                 gamma=0.99,
                 slip_prob=0.0,
                 step_cost=0.0,
@@ -63,7 +63,7 @@ class GridWorldMDP(MDP):
 
         self.init_loc = init_loc
         init_state = GridWorldState(init_loc[0], init_loc[1])
-        MDP.__init__(self, GridWorldMDP.ACTIONS, self._transition_func, self._reward_func, init_state=init_state, gamma=gamma)
+        MDP.__init__(self, GridWorldMDP.ACTIONS, self._transition_func, self._reward_func, init_state=init_state, gamma=gamma, transition_prob = self._transition_prob)
 
         if type(goal_locs) is not list:
             raise ValueError("(simple_rl) GridWorld Error: argument @goal_locs needs to be a list of locations. For example: [(3,3), (4,3)].")
@@ -174,9 +174,6 @@ class GridWorldMDP(MDP):
         Returns:
             (bool): True iff the state-action pair send the agent to the goal state.
         '''
-        if state.is_terminal():
-            return False
-
         if action == "left" and (state.x - 1, state.y) in self.lava_locs:
             return True
         elif action == "right" and (state.x + 1, state.y) in self.lava_locs:
@@ -223,15 +220,54 @@ class GridWorldMDP(MDP):
             next_state = GridWorldState(state.x, state.y)
 
 
-        landed_in_term_goal = (next_state.x, next_state.y) in self.goal_locs and self.is_goal_terminal
-        landed_in_term_lava = (next_state.x, next_state.y) in self.lava_locs and self.is_lava_terminal
-        if landed_in_term_goal or landed_in_term_lava:
-            next_state.set_terminal(True)
+        if (next_state.x, next_state.y) in self.goal_locs:
+            next_state.set_terminal(self.is_goal_terminal)
 
         if (next_state.x, next_state.y) in self.lava_locs:
-            next_state.set_terminal(True)
+            next_state.set_terminal(self.is_lava_terminal)
 
         return next_state
+
+    def _transition_prob(self, state, action):
+        '''
+        Args:
+            state (State)
+            action (str)
+
+        Returns
+            [(State1, Prob1), (State2, Prob2)...]
+        '''
+        if state.is_terminal():
+            return [(state, 1)]
+        stateList = []
+        state_up = GridWorldState(state.x, min(state.y + 1, self.height))
+        state_down = GridWorldState(state.x, max(state.y - 1, 1))
+        state_left = GridWorldState(max(state.x - 1, 1), state.y)
+        state_right = GridWorldState(min(state.x + 1, self.width), state.y)
+        if action == "up":
+            stateList.append((state, 1 - self.slip_prob) if self.is_wall(state_up.x, state_up.y) else (state_up, 1 - self.slip_prob))
+            stateList.append((state, 0.5 * self.slip_prob) if self.is_wall(state_left.x, state_left.y) else (state_left, 0.5 * self.slip_prob))
+            stateList.append((state, 0.5 * self.slip_prob) if self.is_wall(state_right.x, state_right.y) else (state_right, 0.5 * self.slip_prob))
+        if action == "down":
+            stateList.append((state, 1 - self.slip_prob) if self.is_wall(state_down.x, state_down.y) else (state_down, 1 - self.slip_prob))
+            stateList.append((state, 0.5 * self.slip_prob) if self.is_wall(state_left.x, state_left.y) else (state_left, 0.5 * self.slip_prob))
+            stateList.append((state, 0.5 * self.slip_prob) if self.is_wall(state_right.x, state_right.y) else (state_right, 0.5 * self.slip_prob))
+        if action == "right":
+            stateList.append((state, 1 - self.slip_prob) if self.is_wall(state_right.x, state_right.y) else (state_right, 1 - self.slip_prob))
+            stateList.append((state, 0.5 * self.slip_prob) if self.is_wall(state_up.x, state_up.y) else (state_up, 0.5 * self.slip_prob))
+            stateList.append((state, 0.5 * self.slip_prob) if self.is_wall(state_down.x, state_down.y) else (state_down, 0.5 * self.slip_prob))
+        if action == "left":
+            stateList.append((state, 1 - self.slip_prob) if self.is_wall(state_left.x, state_left.y) else (state_left, 1 - self.slip_prob))
+            stateList.append((state, 0.5 * self.slip_prob) if self.is_wall(state_up.x, state_up.y) else (state_up, 0.5 * self.slip_prob))
+            stateList.append((state, 0.5 * self.slip_prob) if self.is_wall(state_down.x, state_down.y) else (state_down, 0.5 * self.slip_prob))
+
+        for next_state in stateList:
+            if (next_state[0].x, next_state[0].y) in self.goal_locs:
+                next_state[0].set_terminal(self.is_goal_terminal)
+            if (next_state[0].x, next_state[0].y) in self.lava_locs:
+                next_state[0].set_terminal(self.is_lava_terminal)
+
+        return stateList
 
     def is_wall(self, x, y):
         '''
@@ -251,8 +287,10 @@ class GridWorldMDP(MDP):
         for x in range(1,self.width+1):
             for y in range(1,self.height+1):
                 state = GridWorldState(x,y)
-                if ((x,y) in self.goal_locs) or ((x,y) in self.lava_locs):
-                    state._is_terminal = True
+                if ((x,y) in self.goal_locs):
+                    state._is_terminal = self.is_goal_terminal
+                if ((x,y) in self.lava_locs):
+                    state._is_terminal = self.is_lava_terminal
                 if not self.is_wall(x,y):
                     states.append(state)
         return states

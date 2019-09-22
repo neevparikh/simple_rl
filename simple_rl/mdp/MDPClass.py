@@ -6,9 +6,10 @@ import copy
 class MDP(object):
     ''' Abstract class for a Markov Decision Process. '''
     
-    def __init__(self, actions, transition_func, reward_func, init_state, gamma=0.99, step_cost=0):
+    def __init__(self, actions, transition_func, reward_func, init_state, gamma=0.99, step_cost=0, transition_prob=None):
         self.actions = actions
         self.transition_func = transition_func
+        self.transition_prob = transition_prob
         self.reward_func = reward_func
         self.gamma = gamma
         self.init_state = copy.deepcopy(init_state)
@@ -47,6 +48,9 @@ class MDP(object):
 
     def get_transition_func(self):
         return self.transition_func
+
+    def get_transition_prob(self):
+        return self.transition_prob
 
     def get_num_state_feats(self):
         return self.init_state.get_num_feats()
