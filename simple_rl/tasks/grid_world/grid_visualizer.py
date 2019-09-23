@@ -47,7 +47,7 @@ def _draw_state(screen,
         else:
             if value:
                 vi = ValueIteration(grid_mdp, sample_rate=10)
-                vi.run_vi()
+#                vi.run_vi()
                 for s in vi.get_states():
                     val_text_dict[s.x][s.y] = value(s)
             else:
@@ -62,7 +62,7 @@ def _draw_state(screen,
     if policy:
 #        pass
         vi = ValueIteration(grid_mdp)
-        vi.run_vi()
+#        vi.run_vi()
         for s in vi.get_states():
             policy_dict[s.x][s.y] = policy(s)
 
@@ -96,6 +96,10 @@ def _draw_state(screen,
                 if show_value and not grid_mdp.is_wall(i+1, grid_mdp.height - j):
                     # Draw the value.
                     val = val_text_dict[i+1][grid_mdp.height - j]
+                    if (i+1, grid_mdp.height - j) in goal_locs:
+                        val = 1 
+                    if (i+1, grid_mdp.height - j) in lava_locs:
+                        val = -grid_mdp.lava_cost 
                     color = mdpv.val_to_color(val)
                     pygame.draw.rect(screen, color, top_left_point + (cell_width, cell_height), 0)
 
