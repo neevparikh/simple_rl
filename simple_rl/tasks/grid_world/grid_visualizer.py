@@ -5,12 +5,9 @@ try:
     import pygame
 except ImportError:
     print("Warning: pygame not installed (needed for visuals).")
-import random
-import sys
 
 # Other imports.
 from simple_rl.planning import ValueIteration
-from simple_rl.tasks import FourRoomMDP
 from simple_rl.utils import mdp_visualizer as mdpv
 
 
@@ -38,7 +35,7 @@ def _draw_state(screen,
         (pygame.Shape)
     '''
     # Make value dict.
-    val_text_dict = defaultdict(lambda : defaultdict(float))
+    val_text_dict = defaultdict(lambda: defaultdict(float))
     if show_value:
         if agent is not None:
             # Use agent value estimates.
@@ -58,9 +55,9 @@ def _draw_state(screen,
                     val_text_dict[s.x][s.y] = vi.get_value(s)
 
     # Make policy dict.
-    policy_dict = defaultdict(lambda : defaultdict(str))
+    policy_dict = defaultdict(lambda: defaultdict(str))
     if policy:
-#        pass
+        #        pass
         vi = ValueIteration(grid_mdp)
         vi.run_vi()
         for s in vi.get_states():
@@ -69,14 +66,14 @@ def _draw_state(screen,
     # Prep some dimensions to make drawing easier.
     scr_width, scr_height = screen.get_width(), screen.get_height()
     width_buffer = scr_width / 10.0
-    height_buffer = 30 + (scr_height / 10.0) # Add 30 for title.
-    cell_width = (scr_width - width_buffer * 2) / grid_mdp.width 
+    height_buffer = 30 + (scr_height / 10.0)  # Add 30 for title.
+    cell_width = (scr_width - width_buffer * 2) / grid_mdp.width
     cell_height = (scr_height - height_buffer * 2) / grid_mdp.height
     goal_locs = grid_mdp.get_goal_locs()
     lava_locs = grid_mdp.get_lava_locs()
     font_size = int(min(cell_width, cell_height) / 4.0)
     reg_font = pygame.font.SysFont("CMU Serif", font_size)
-    cc_font = pygame.font.SysFont("Courier", font_size*2 + 2)
+    cc_font = pygame.font.SysFont("Courier", font_size * 2 + 2)
 
     # Draw the static entities.
     if draw_statics:
@@ -84,69 +81,101 @@ def _draw_state(screen,
         for i in range(grid_mdp.width):
             # For each column:
             for j in range(grid_mdp.height):
-
-                top_left_point = width_buffer + cell_width*i, height_buffer + cell_height*j
-                r = pygame.draw.rect(screen, (46, 49, 49), top_left_point + (cell_width, cell_height), 3)
+                top_left_point = width_buffer + cell_width * i, height_buffer + cell_height * j
+                r = pygame.draw.rect(
+                    screen, (46, 49, 49),
+                    top_left_point + (cell_width, cell_height), 3)
 
                 # Current state.
-                if show_value and (i+1,grid_mdp.height - j) == (state.x, state.y) and agent_shape is None:
-                    tri_center = int(top_left_point[0] + cell_width/2.0), int(top_left_point[1] + cell_height/2.0)
-                    agent_shape = _draw_agent(tri_center, screen, base_size=min(cell_width, cell_height)/2.5 - 10)
+                if show_value and (i + 1, grid_mdp.height - j) == (
+                        state.x, state.y) and agent_shape is None:
+                    tri_center = int(top_left_point[0] +
+                                     cell_width / 2.0), int(top_left_point[1] +
+                                                            cell_height / 2.0)
+                    agent_shape = _draw_agent(
+                        tri_center,
+                        screen,
+                        base_size=min(cell_width, cell_height) / 2.5 - 10)
 
-                if show_value and not grid_mdp.is_wall(i+1, grid_mdp.height - j):
+                if show_value and not grid_mdp.is_wall(i + 1,
+                                                       grid_mdp.height - j):
                     # Draw the value.
-                    val = val_text_dict[i+1][grid_mdp.height - j]
+                    val = val_text_dict[i + 1][grid_mdp.height - j]
                     color = mdpv.val_to_color(val)
-                    pygame.draw.rect(screen, color, top_left_point + (cell_width, cell_height), 0)
+                    pygame.draw.rect(
+                        screen, color,
+                        top_left_point + (cell_width, cell_height), 0)
 
-                if policy and not grid_mdp.is_wall(i+1, grid_mdp.height - j):
-                    a = policy_dict[i+1][grid_mdp.height - j]
+                if policy and not grid_mdp.is_wall(i + 1, grid_mdp.height - j):
+                    a = policy_dict[i + 1][grid_mdp.height - j]
                     if a not in action_char_dict:
                         text_a = a
                     else:
                         text_a = action_char_dict[a]
-                    text_center_point = int(top_left_point[0] + cell_width/2.0 - 10), int(top_left_point[1] + cell_height/3.0)
-                    text_rendered_a = cc_font.render(text_a, True, (46, 49, 49))
+                    text_center_point = int(top_left_point[0] +
+                                            cell_width / 2.0 -
+                                            10), int(top_left_point[1] +
+                                                     cell_height / 3.0)
+                    text_rendered_a = cc_font.render(text_a, True,
+                                                     (46, 49, 49))
                     screen.blit(text_rendered_a, text_center_point)
 
-                if grid_mdp.is_wall(i+1, grid_mdp.height - j):
+                if grid_mdp.is_wall(i + 1, grid_mdp.height - j):
                     # Draw the walls.
-                    top_left_point = width_buffer + cell_width*i + 5, height_buffer + cell_height*j + 5
-                    r = pygame.draw.rect(screen, (94, 99, 99), top_left_point + (cell_width-10, cell_height-10), 0)
+                    top_left_point = width_buffer + cell_width * i + 5, height_buffer + cell_height * j + 5
+                    r = pygame.draw.rect(
+                        screen, (94, 99, 99),
+                        top_left_point + (cell_width - 10, cell_height - 10),
+                        0)
 
-                if (i+1,grid_mdp.height - j) in goal_locs:
+                if (i + 1, grid_mdp.height - j) in goal_locs:
                     # Draw goal.
-                    circle_center = int(top_left_point[0] + cell_width/2.0), int(top_left_point[1] + cell_height/2.0)
+                    circle_center = int(top_left_point[0] + cell_width /
+                                        2.0), int(top_left_point[1] +
+                                                  cell_height / 2.0)
                     circler_color = (154, 195, 157)
-                    pygame.draw.circle(screen, circler_color, circle_center, int(min(cell_width, cell_height) / 4.0))
+                    pygame.draw.circle(screen, circler_color, circle_center,
+                                       int(min(cell_width, cell_height) / 4.0))
 
-                if (i+1,grid_mdp.height - j) in lava_locs:
+                if (i + 1, grid_mdp.height - j) in lava_locs:
                     # Draw goal.
-                    circle_center = int(top_left_point[0] + cell_width/2.0), int(top_left_point[1] + cell_height/2.0)
+                    circle_center = int(top_left_point[0] + cell_width /
+                                        2.0), int(top_left_point[1] +
+                                                  cell_height / 2.0)
                     circler_color = (224, 145, 157)
-                    pygame.draw.circle(screen, circler_color, circle_center, int(min(cell_width, cell_height) / 4.0))
+                    pygame.draw.circle(screen, circler_color, circle_center,
+                                       int(min(cell_width, cell_height) / 4.0))
 
-
-                if show_value and not grid_mdp.is_wall(i+1, grid_mdp.height - j):
+                if show_value and not grid_mdp.is_wall(i + 1,
+                                                       grid_mdp.height - j):
                     # Write value text to each state.
-                    value_text = reg_font.render(str(round(val, 2)), True, (46, 49, 49))
-                    text_center_point = int(top_left_point[0] + cell_width/14.0), int(top_left_point[1] + cell_height/11.0)
+                    value_text = reg_font.render(str(round(val, 2)), True,
+                                                 (46, 49, 49))
+                    text_center_point = int(top_left_point[0] + cell_width /
+                                            14.0), int(top_left_point[1] +
+                                                       cell_height / 11.0)
                     screen.blit(value_text, text_center_point)
-
-
 
     if agent_shape is not None:
         # Clear the old shape.
         # pygame.draw.rect(screen, (255,255,255), agent_shape, 1)
-        top_left_point = width_buffer + cell_width*(state.x - 1), height_buffer + cell_height*(grid_mdp.height - state.y)
-        tri_center = int(top_left_point[0] + cell_width/2.0), int(top_left_point[1] + cell_height/2.0)
+        top_left_point = width_buffer + cell_width * (
+            state.x - 1), height_buffer + cell_height * (grid_mdp.height -
+                                                         state.y)
+        tri_center = int(top_left_point[0] +
+                         cell_width / 2.0), int(top_left_point[1] +
+                                                cell_height / 2.0)
 
         # Draw new.
-        agent_shape = _draw_agent(tri_center, screen, base_size=min(cell_width, cell_height)/2.5 - 10)
+        agent_shape = _draw_agent(
+            tri_center,
+            screen,
+            base_size=min(cell_width, cell_height) / 2.5 - 10)
 
     pygame.display.flip()
 
     return agent_shape
+
 
 def _draw_agent(center_point, screen, base_size=20):
     '''
