@@ -354,7 +354,7 @@ def visualize_agent(mdp, agent, draw_state, cur_state=None, scr_width=720, scr_h
                 agent_shape = draw_state(screen, mdp, cur_state, agent_shape=agent_shape)
 
                 # Update state text.
-                _draw_lower_left_text(cur_state, screen)
+                # _draw_lower_left_text(cur_state, screen)
 
         if cur_state.is_terminal():
             # Done! Agent found goal.
@@ -405,7 +405,7 @@ def visualize_interaction(mdp, draw_state, cur_state=None, scr_width=720, scr_he
                 agent_shape = draw_state(screen, mdp, cur_state, agent_shape=agent_shape)
 
                 # Update state text.
-                _draw_lower_left_text(cur_state, screen)
+                # _draw_lower_left_text(cur_state, screen)
 
         if cur_state.is_terminal():
             # Done! Agent found goal. Not if the state is lava!! (Tofix)
@@ -424,8 +424,8 @@ def _vis_init(screen, mdp, draw_state, cur_state, agent=None, value=None, score=
     pygame.display.update()
     done = False
 
-    if score != -1:
-        _draw_lower_left_text("Score: " + str(score), screen)
+    # if score != -1:
+        # _draw_lower_left_text("Score: " + str(score), screen)
     agent_shape = draw_state(screen=screen, grid_mdp=mdp, value=value, state=cur_state, agent=agent, show_value=True, draw_statics=True)
 
     return agent_shape
