@@ -145,10 +145,6 @@ class ValueIteration(Planner):
             for s in state_space:
                 self.bellman_backups += 1
                 if s.is_terminal():
-                    # terminal_reward = self.reward_func(s, self.actions[0])
-                    # print("s: {}\t terminal_reward: {}".format(s, terminal_reward))
-                    # self.value_func[s] = terminal_reward
-                    # self.value_func[s] = max_q
                     continue
 
                 max_q = float("-inf")
