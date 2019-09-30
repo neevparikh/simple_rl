@@ -18,7 +18,7 @@ else:
 class ValueIteration(Planner):
 
     def __init__(self, mdp, name="value_iter", delta=0.0001, max_iterations=500,
-                 sample_rate=3):
+                 sample_rate=1000):
         '''
         Args:
             mdp (MDP)
@@ -55,9 +55,12 @@ class ValueIteration(Planner):
 
         for s in self.get_states():
             for a in self.actions:
-                for sample in range(self.sample_rate):
-                    s_prime = self.transition_func(s, a)
-                    self.trans_dict[s][a][s_prime] += 1.0 / self.sample_rate
+                stateList = self.transition_prob(s, a)
+                for s_prime in stateList:
+                    self.trans_dict[s][a][s_prime[0]] += s_prime[1]
+#                for sample in range(self.sample_rate):
+#                    s_prime = self.transition_func(s, a)
+#                    self.trans_dict[s][a][s_prime] += 1.0 / self.sample_rate
 
         self.has_computed_matrix = True
 
@@ -142,10 +145,6 @@ class ValueIteration(Planner):
             for s in state_space:
                 self.bellman_backups += 1
                 if s.is_terminal():
-                    # terminal_reward = self.reward_func(s, self.actions[0])
-                    # print("s: {}\t terminal_reward: {}".format(s, terminal_reward))
-                    # self.value_func[s] = terminal_reward
-                    # self.value_func[s] = max_q
                     continue
 
                 max_q = float("-inf")
