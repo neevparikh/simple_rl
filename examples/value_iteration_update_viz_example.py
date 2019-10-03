@@ -154,8 +154,14 @@ def main():
                         const=500,
                         default=500,
                         help='Maximum number of iterations VI runs for')
+    parser.add_argument('--skip',
+                        action='store_true',
+                        help='Skip to last frame or not')
 
     args = parser.parse_args()
+    if args.skip is None:
+        args.skip = False
+
     mdp = generate_MDP(args.width, args.height, args.i_loc, args.g_loc,
                        args.l_loc, args.gamma, args.Walls, args.slip)
 
@@ -168,12 +174,17 @@ def main():
     print('Took {:.4f} seconds'.format(end - st))
 
     # For every value backup, visualize the policy
-    for i, action_dict in enumerate(q_act_histories):
-        print('Showing history {:04d} of {:04d}'.format(i + 1, num_hist))
-        # Note: This lambda is necessary because the policy must be a function
+    if args.skip:
         mdp.visualize_policy_values(
-            (lambda in_state: action_dict[in_state]),
-            (lambda curr_state: val_histories[i][curr_state]))
+                (lambda in_state: q_act_histories[-1][in_state]),
+                (lambda curr_state: val_histories[-1][curr_state]))
+    else:
+        for i in range(num_hist):
+            print('Showing history {:04d} of {:04d}'.format(i + 1, num_hist))
+            # Note: This lambda is necessary because the policy must be a function
+            mdp.visualize_policy_values(
+                (lambda in_state: q_act_histories[i][in_state]),
+                (lambda curr_state: val_histories[i][curr_state]))
 
 
 if __name__ == "__main__":
