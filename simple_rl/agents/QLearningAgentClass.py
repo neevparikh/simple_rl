@@ -9,10 +9,19 @@ from collections import defaultdict
 # Other imports.
 from simple_rl.agents.AgentClass import Agent
 
+
 class QLearningAgent(Agent):
     ''' Implementation for a Q Learning Agent '''
-
-    def __init__(self, actions, name="Q-learning", alpha=0.1, gamma=0.99, epsilon=0.1, explore="uniform", anneal=False, custom_q_init=None, default_q=0):
+    def __init__(self,
+                 actions,
+                 name="Q-learning",
+                 alpha=0.1,
+                 gamma=0.99,
+                 epsilon=0.1,
+                 explore="uniform",
+                 anneal=False,
+                 custom_q_init=None,
+                 default_q=0):
         '''
         Args:
             actions (list): Contains strings denoting the actions.
@@ -21,18 +30,24 @@ class QLearningAgent(Agent):
             gamma (float): Discount factor.
             epsilon (float): Exploration term.
             explore (str): One of {softmax, uniform}. Denotes explore policy.
-            custom_q_init (defaultdict{state, defaultdict{action, float}}): a dictionary of dictionaries storing the initial q-values. Can be used for potential shaping (Wiewiora, 2003)
-            default_q (float): the default value to initialize every entry in the q-table with [by default, set to 0.0]
+            custom_q_init (defaultdict{state, defaultdict{action, float}}): a
+            dictionary of dictionaries storing the initial q-values. Can be
+            used for potential shaping (Wiewiora, 2003)
+            default_q (float): the default value to initialize every entry in
+            the q-table with [by default, set to 0.0]
         '''
         name_ext = "-" + explore if explore != "uniform" else ""
-        Agent.__init__(self, name=name + name_ext, actions=actions, gamma=gamma)
+        Agent.__init__(self,
+                       name=name + name_ext,
+                       actions=actions,
+                       gamma=gamma)
 
         # Set/initialize parameters and other relevant classwide data
         self.alpha, self.alpha_init = alpha, alpha
         self.epsilon, self.epsilon_init = epsilon, epsilon
         self.step_number = 0
         self.anneal = anneal
-        self.default_q = default_q # 0 # 1 / (1 - self.gamma)
+        self.default_q = default_q  # 0 # 1 / (1 - self.gamma)
         self.explore = explore
         self.custom_q_init = custom_q_init
 
@@ -40,13 +55,13 @@ class QLearningAgent(Agent):
         if self.custom_q_init:
             self.q_func = self.custom_q_init
         else:
-            self.q_func = defaultdict(lambda: defaultdict(lambda: self.default_q))
-        
+            self.q_func = defaultdict(
+                lambda: defaultdict(lambda: self.default_q))
+
         # Key: state
         # Val: dict
-            #   Key: action
-            #   Val: q-value
-
+        #   Key: action
+        #   Val: q-value
 
     def get_parameters(self):
         '''
@@ -127,7 +142,9 @@ class QLearningAgent(Agent):
         Returns:
             (str): action.
         '''
-        return numpy.random.choice(self.actions, 1, p=self.get_action_distr(state))[0]
+        return numpy.random.choice(self.actions,
+                                   1,
+                                   p=self.get_action_distr(state))[0]
 
     # ---------------------------------
     # ---- Q VALUES AND PARAMETERS ----
@@ -152,13 +169,16 @@ class QLearningAgent(Agent):
         # Update the Q Function.
         max_q_curr_state = self.get_max_q_value(next_state)
         prev_q_val = self.get_q_value(state, action)
-        self.q_func[state][action] = (1 - self.alpha) * prev_q_val + self.alpha * (reward + self.gamma*max_q_curr_state)
-        
+        self.q_func[state][action] = (
+            1 - self.alpha) * prev_q_val + self.alpha * (
+                reward + self.gamma * max_q_curr_state)
 
     def _anneal(self):
         # Taken from "Note on learning rate schedules for stochastic optimization, by Darken and Moody (Yale)":
-        self.alpha = self.alpha_init / (1.0 +  (self.step_number / 1000.0)*(self.episode_number + 1) / 2000.0 )
-        self.epsilon = self.epsilon_init / (1.0 + (self.step_number / 1000.0)*(self.episode_number + 1) / 2000.0 )
+        self.alpha = self.alpha_init / (1.0 + (self.step_number / 1000.0) *
+                                        (self.episode_number + 1) / 2000.0)
+        self.epsilon = self.epsilon_init / (1.0 + (self.step_number / 1000.0) *
+                                            (self.episode_number + 1) / 2000.0)
 
     def _compute_max_qval_action_pair(self, state):
         '''
@@ -250,7 +270,8 @@ class QLearningAgent(Agent):
         if self.custom_q_init:
             self.q_func = self.custom_q_init
         else:
-            self.q_func = defaultdict(lambda : defaultdict(lambda: self.default_q))
+            self.q_func = defaultdict(
+                lambda: defaultdict(lambda: self.default_q))
         Agent.reset(self)
 
     def end_of_episode(self):
