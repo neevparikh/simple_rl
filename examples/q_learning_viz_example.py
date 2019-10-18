@@ -71,8 +71,8 @@ def parse_args():
         default=[(3, 3)],
         help=
         "a list of tuples of of integer-valued coordinates where the agent will receive a large \
-            reward and enter a terminal state. Each coordinate is a location on the grid with one- \
-            indexing. For example, do -gl '[(3,3)]' , be sure to include apostrophes (unless you use \
+            reward and enter a terminal state. Each coordinate is a location on the grid with one-\
+            indexing. For example, do -gl '[(3,3)]', be sure to include apostrophes (unless you use\
             Windows) or argparse will fail!")
     parser.add_argument(
         '-ll',
@@ -118,16 +118,27 @@ def parse_args():
                         '--epsilon',
                         type=float,
                         nargs="?",
-                        const=0.95,
-                        default=0.95,
-                        help='a float representing the exploration term')
+                        const=0.1,
+                        default=0.1,
+                        help='a float representing the epsilon term')
+    parser.add_argument('-an',
+                        '--anneal',
+                        action='store_true',
+                        help='to anneal or not in q learning')
+    parser.add_argument('-ex',
+                        '--explore',
+                        type=str,
+                        nargs="?",
+                        const="uniform",
+                        default="uniform",
+                        help='a string representing the exploration term')
     parser.add_argument('-m',
                         '--mode',
                         type=str,
                         nargs="?",
                         const='learning',
                         default='learning',
-                        help='Mode of visualization')
+                        help='Mode of visualization: one of [value, policy, learning, agent]')
 
     args = parser.parse_args()
     return args
@@ -159,7 +170,9 @@ def main():
 
     ql_agent = QLearningAgent(mdp.get_actions(),
                               epsilon=args.epsilon,
-                              alpha=args.alpha)
+                              alpha=args.alpha, 
+                              explore=args.explore, 
+                              anneal=args.anneal)
     viz = args.mode
 
     if viz == "value":
