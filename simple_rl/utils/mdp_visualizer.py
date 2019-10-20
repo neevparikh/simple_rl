@@ -354,6 +354,7 @@ def visualize_learning(mdp,
     else:
         # Main loop.
         i = 0
+        terminal_to_init = False
         while i < num_ep:
             j = 0
             while j < num_steps:
@@ -371,8 +372,8 @@ def visualize_learning(mdp,
                         mdp.reset()
 
                 # Move agent.
-                learning = (cur_state != init_state)
-                action = agent.act(cur_state, reward, learning)
+                action = agent.act(cur_state, reward, not (terminal_to_init))
+                terminal_to_init = False
                 reward, cur_state = mdp.execute_agent_action(action)
                 agent_shape = draw_state(screen,
                                          mdp,
@@ -393,6 +394,7 @@ def visualize_learning(mdp,
                 if cur_state.is_terminal():
                     action = agent.act(cur_state, reward)
                     cur_state = mdp.get_init_state()
+                    terminal_to_init = True
                     mdp.reset()
                     agent_shape = _vis_init(screen,
                                             mdp,
