@@ -294,7 +294,10 @@ def plot(results, experiment_dir, agents, plot_file_name="", conf_intervals=[], 
     if open_plot:
         # Open it.
         open_prefix = "xdg-" if sys.platform == "linux" or sys.platform == "linux2" else ""
-        os.system(open_prefix + "open " + plot_file_name)
+        if sys.platform == "win32":
+            os.system(open_prefix + "start " + plot_file_name)
+        else:
+            os.system(open_prefix + "open " + plot_file_name)
 
     # Clear and close.
     pyplot.cla()
