@@ -176,8 +176,8 @@ def main():
     # For every value backup, visualize the policy
     if args.skip:
         mdp.visualize_policy_values(
-                (lambda in_state: q_act_histories[-1][in_state]),
-                (lambda curr_state: val_histories[-1][curr_state]))
+            (lambda in_state: q_act_histories[-1][in_state]),
+            (lambda curr_state: val_histories[-1][curr_state]))
     else:
         for i in range(num_hist):
             print('Showing history {:04d} of {:04d}'.format(i + 1, num_hist))
