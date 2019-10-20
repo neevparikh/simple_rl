@@ -13,9 +13,9 @@ except ImportError:
     print("Error: pygame not installed (needed for visuals).")
     exit()
 
-
 # Other imports.
 from simple_rl.utils.chart_utils import color_ls
+
 
 def val_to_color(val, good_col=(169, 193, 249), bad_col=(249, 193, 169)):
     '''
@@ -40,9 +40,11 @@ def val_to_color(val, good_col=(169, 193, 249), bad_col=(249, 193, 169)):
         result = tuple([255 * (1 - val) + (col * val) for col in good_col])
     else:
         # Show negative as interpolated between white (0) and bad_col (-1.0)
-        result = tuple([255 * (1 - abs(val)) + (col * abs(val)) for col in bad_col])
+        result = tuple(
+            [255 * (1 - abs(val)) + (col * abs(val)) for col in bad_col])
 
     return result
+
 
 def _draw_title_text(mdp, screen):
     '''
@@ -55,7 +57,9 @@ def _draw_title_text(mdp, screen):
     '''
     scr_width, scr_height = screen.get_width(), screen.get_height()
     title_text = title_font.render(str(mdp), True, (46, 49, 49))
-    screen.blit(title_text, (scr_width / 2.0 - len(str(mdp))*6, scr_width / 20.0))
+    screen.blit(title_text,
+                (scr_width / 2.0 - len(str(mdp)) * 6, scr_width / 20.0))
+
 
 def _draw_agent_text(agent, screen):
     '''
@@ -68,9 +72,11 @@ def _draw_agent_text(agent, screen):
     '''
     scr_width, scr_height = screen.get_width(), screen.get_height()
     formatted_agent_text = "agent: " + str(agent)
-    agent_text_point = (3*scr_width / 4.0 - len(formatted_agent_text)*6, 18*scr_height / 20.0)
+    agent_text_point = (3 * scr_width / 4.0 - len(formatted_agent_text) * 6,
+                        18 * scr_height / 20.0)
     agent_text = title_font.render(formatted_agent_text, True, (46, 49, 49))
     screen.blit(agent_text, agent_text_point)
+
 
 def _draw_lower_left_text(state, screen, score=-1):
     '''
@@ -88,12 +94,22 @@ def _draw_lower_left_text(state, screen, score=-1):
     if len(formatted_state_text) > 20:
         # State text is too long, ignore.
         return
-    state_text_point = (scr_width / 4.0 - len(formatted_state_text)*7, 18*scr_height / 20.0)
-    pygame.draw.rect(screen, (255,255,255), (state_text_point[0] - 20, state_text_point[1]) + (200,40))
+    state_text_point = (scr_width / 4.0 - len(formatted_state_text) * 7,
+                        18 * scr_height / 20.0)
+    pygame.draw.rect(screen, (255, 255, 255),
+                     (state_text_point[0] - 20, state_text_point[1]) +
+                     (200, 40))
     state_text = title_font.render(formatted_state_text, True, (46, 49, 49))
     screen.blit(state_text, state_text_point)
 
-def visualize_policy(mdp, policy, draw_state, action_char_dict, cur_state=None, scr_width=720, scr_height=720):
+
+def visualize_policy(mdp,
+                     policy,
+                     draw_state,
+                     action_char_dict,
+                     cur_state=None,
+                     scr_width=720,
+                     scr_height=720):
     '''
     Args:
         mdp (MDP)
@@ -113,24 +129,39 @@ def visualize_policy(mdp, policy, draw_state, action_char_dict, cur_state=None, 
     cur_state = mdp.get_init_state() if cur_state is None else cur_state
 
     agent_shape = _vis_init(screen, mdp, draw_state, cur_state, value=True)
-    draw_state(screen, mdp, cur_state, policy=policy, action_char_dict=action_char_dict, show_value=False, draw_statics=True)
+    draw_state(screen,
+               mdp,
+               cur_state,
+               policy=policy,
+               action_char_dict=action_char_dict,
+               show_value=False,
+               draw_statics=True)
     pygame.display.flip()
     quit = False
     while not quit:
         # Check for key presses.
         for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            if event.type == QUIT or (event.type == KEYDOWN
+                                      and event.key == K_ESCAPE):
                 # Quit.
                 pygame.quit()
                 quit = True
                 break
             if event.type == KEYDOWN and event.key == K_q:
                 pygame.quit()
-                sys.exit()            
+                sys.exit()
 
         time.sleep(0.1)
 
-def visualize_policy_values(mdp, policy, value_mapping, draw_state, action_char_dict, cur_state=None, scr_width=720, scr_height=720):
+
+def visualize_policy_values(mdp,
+                            policy,
+                            value_mapping,
+                            draw_state,
+                            action_char_dict,
+                            cur_state=None,
+                            scr_width=720,
+                            scr_height=720):
     '''
     Args:
         mdp (MDP)
@@ -149,25 +180,42 @@ def visualize_policy_values(mdp, policy, value_mapping, draw_state, action_char_
     # Setup and draw initial state.
     cur_state = mdp.get_init_state() if cur_state is None else cur_state
 
-    agent_shape = _vis_init(screen, mdp, draw_state, cur_state, value=value_mapping)
-    draw_state(screen, mdp, cur_state, policy=policy, value=value_mapping, action_char_dict=action_char_dict, show_value=False, draw_statics=True)
+    agent_shape = _vis_init(screen,
+                            mdp,
+                            draw_state,
+                            cur_state,
+                            value=value_mapping)
+    draw_state(screen,
+               mdp,
+               cur_state,
+               policy=policy,
+               value=value_mapping,
+               action_char_dict=action_char_dict,
+               show_value=False,
+               draw_statics=True)
     pygame.display.flip()
     quit = False
     while not quit:
         # Check for key presses.
         for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            if event.type == QUIT or (event.type == KEYDOWN
+                                      and event.key == K_ESCAPE):
                 # Quit.
                 pygame.quit()
                 quit = True
                 break
             if event.type == KEYDOWN and event.key == K_q:
                 pygame.quit()
-                sys.exit()            
+                sys.exit()
 
         time.sleep(0.1)
 
-def visualize_value(mdp, draw_state, cur_state=None, scr_width=720, scr_height=720):
+
+def visualize_value(mdp,
+                    draw_state,
+                    cur_state=None,
+                    scr_width=720,
+                    scr_height=720):
     '''
     Args:
         mdp (MDP)
@@ -189,14 +237,24 @@ def visualize_value(mdp, draw_state, cur_state=None, scr_width=720, scr_height=7
     while True:
         # Check for key presses.
         for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            if event.type == QUIT or (event.type == KEYDOWN
+                                      and event.key == K_ESCAPE):
                 # Quit.
                 pygame.quit()
                 sys.exit()
 
         time.sleep(0.1)
 
-def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, scr_height=720, delay=0, num_ep=None, num_steps=None):
+
+def visualize_learning(mdp,
+                       agent,
+                       draw_state,
+                       cur_state=None,
+                       scr_width=720,
+                       scr_height=720,
+                       delay=0,
+                       num_ep=None,
+                       num_steps=None):
     '''
     Args:
         mdp (MDP)
@@ -215,13 +273,19 @@ def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, sc
     screen = pygame.display.set_mode((scr_width, scr_height))
 
     # Setup and draw initial state.
-    cur_state = mdp.get_init_state() if cur_state is None else cur_state
+    init_state = mdp.get_init_state()
+    cur_state = init_state if cur_state is None else cur_state
     reward = 0
-    rpl = 0 
+    rpl = 0
     score = 0
     default_goal_x, default_goal_y = mdp.width, mdp.height
-    agent_shape = _vis_init(screen, mdp, draw_state, cur_state, agent, score=score)
-    
+    agent_shape = _vis_init(screen,
+                            mdp,
+                            draw_state,
+                            cur_state,
+                            agent,
+                            score=score)
+
     pygame.display.update()
     done = False
 
@@ -230,13 +294,13 @@ def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, sc
         while not done:
             # Check for key presses.
             for event in pygame.event.get():
-                if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                if event.type == QUIT or (event.type == KEYDOWN
+                                          and event.key == K_ESCAPE):
                     # Quit.
                     pygame.quit()
                     sys.exit()
                 elif event.type == KEYDOWN and event.key == K_r:
                     score = 0
-                    agent.reset()
                     mdp.goal_locs = [(default_goal_x, default_goal_y)]
                     mdp.reset()
 
@@ -244,8 +308,10 @@ def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, sc
                     pos = pygame.mouse.get_pos()
                     x, y = pos[0], pos[1]
                     width_buffer = scr_width / 10.0
-                    height_buffer = 30 + (scr_height / 10.0) # Add 30 for title.
-                    cell_x, cell_y = convert_x_y_to_grid_cell(x, y, scr_width, scr_height, mdp.width, mdp.height)
+                    height_buffer = 30 + (scr_height / 10.0
+                                          )  # Add 30 for title.
+                    cell_x, cell_y = convert_x_y_to_grid_cell(
+                        x, y, scr_width, scr_height, mdp.width, mdp.height)
 
                     if event.button == 1:
                         # Left clicked a cell, move the goal.
@@ -261,7 +327,13 @@ def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, sc
             # Move agent.
             action = agent.act(cur_state, reward)
             reward, cur_state = mdp.execute_agent_action(action)
-            agent_shape = draw_state(screen, mdp, cur_state, agent=agent, show_value=True, draw_statics=True,agent_shape=agent_shape)
+            agent_shape = draw_state(screen,
+                                     mdp,
+                                     cur_state,
+                                     agent=agent,
+                                     show_value=True,
+                                     draw_statics=True,
+                                     agent_shape=agent_shape)
 
             score += int(reward)
 
@@ -273,7 +345,12 @@ def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, sc
                 score += 1
                 cur_state = mdp.get_init_state()
                 mdp.reset()
-                agent_shape = _vis_init(screen, mdp, draw_state, cur_state, agent, score=score)
+                agent_shape = _vis_init(screen,
+                                        mdp,
+                                        draw_state,
+                                        cur_state,
+                                        agent,
+                                        score=score)
     else:
         # Main loop.
         i = 0
@@ -282,7 +359,8 @@ def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, sc
             while j < num_steps:
                 # Check for key presses.
                 for event in pygame.event.get():
-                    if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                    if event.type == QUIT or (event.type == KEYDOWN
+                                              and event.key == K_ESCAPE):
                         # Quit.
                         pygame.quit()
                         sys.exit()
@@ -293,32 +371,56 @@ def visualize_learning(mdp, agent, draw_state, cur_state=None, scr_width=720, sc
                         mdp.reset()
 
                 # Move agent.
-                action = agent.act(cur_state, reward)
+                learning = (cur_state != init_state)
+                action = agent.act(cur_state, reward, learning)
                 reward, cur_state = mdp.execute_agent_action(action)
-                agent_shape = draw_state(screen, mdp, cur_state, agent=agent, show_value=True, draw_statics=True,agent_shape=agent_shape)
-                
+                agent_shape = draw_state(screen,
+                                         mdp,
+                                         cur_state,
+                                         agent=agent,
+                                         show_value=True,
+                                         draw_statics=True,
+                                         agent_shape=agent_shape)
+
                 score = round(rpl)
                 rpl += reward
 
                 pygame.display.update()
 
                 time.sleep(delay)
-                j+=1
+                j += 1
 
                 if cur_state.is_terminal():
+                    action = agent.act(cur_state, reward)
                     cur_state = mdp.get_init_state()
                     mdp.reset()
-                    agent_shape = _vis_init(screen, mdp, draw_state, cur_state, agent, score=score)
+                    agent_shape = _vis_init(screen,
+                                            mdp,
+                                            draw_state,
+                                            cur_state,
+                                            agent,
+                                            score=score)
                     break
-            
-            i+=1
+
+            i += 1
             cur_state = mdp.get_init_state()
             mdp.reset()
-            agent_shape = _vis_init(screen, mdp, draw_state, cur_state, agent, score=score)
+            agent_shape = _vis_init(screen,
+                                    mdp,
+                                    draw_state,
+                                    cur_state,
+                                    agent,
+                                    score=score)
 
     pygame.display.flip()
 
-def visualize_agent(mdp, agent, draw_state, cur_state=None, scr_width=720, scr_height=720):
+
+def visualize_agent(mdp,
+                    agent,
+                    draw_state,
+                    cur_state=None,
+                    scr_width=720,
+                    scr_height=720):
     '''
     Args:
         mdp (MDP)
@@ -336,14 +438,19 @@ def visualize_agent(mdp, agent, draw_state, cur_state=None, scr_width=720, scr_h
     # Setup and draw initial state.
     cur_state = mdp.get_init_state() if cur_state is None else cur_state
     reward = 0
-    agent_shape = _vis_init(screen=screen, mdp=mdp, draw_state=draw_state, cur_state=cur_state, agent=agent)
+    agent_shape = _vis_init(screen=screen,
+                            mdp=mdp,
+                            draw_state=draw_state,
+                            cur_state=cur_state,
+                            agent=agent)
 
     done = False
     while not done:
 
         # Check for key presses.
         for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            if event.type == QUIT or (event.type == KEYDOWN
+                                      and event.key == K_ESCAPE):
                 # Quit.
                 pygame.quit()
                 sys.exit()
@@ -351,7 +458,10 @@ def visualize_agent(mdp, agent, draw_state, cur_state=None, scr_width=720, scr_h
                 # Move agent.
                 action = agent.act(cur_state, reward)
                 reward, cur_state = mdp.execute_agent_action(action)
-                agent_shape = draw_state(screen, mdp, cur_state, agent_shape=agent_shape)
+                agent_shape = draw_state(screen,
+                                         mdp,
+                                         cur_state,
+                                         agent_shape=agent_shape)
 
                 # Update state text.
                 # _draw_lower_left_text(cur_state, screen)
@@ -359,14 +469,21 @@ def visualize_agent(mdp, agent, draw_state, cur_state=None, scr_width=720, scr_h
         if cur_state.is_terminal():
             # Done! Agent found goal.
             goal_text = "Victory!"
-            goal_text_rendered = title_font.render(goal_text, True, (206, 147, 66))
-            goal_text_point = scr_width / 2.0 - (len(goal_text)*7), 18*scr_height / 20.0
+            goal_text_rendered = title_font.render(goal_text, True,
+                                                   (206, 147, 66))
+            goal_text_point = scr_width / 2.0 - (len(goal_text) *
+                                                 7), 18 * scr_height / 20.0
             screen.blit(goal_text_rendered, goal_text_point)
             done = True
 
         pygame.display.flip()
 
-def visualize_interaction(mdp, draw_state, cur_state=None, scr_width=720, scr_height=720):
+
+def visualize_interaction(mdp,
+                          draw_state,
+                          cur_state=None,
+                          scr_width=720,
+                          scr_height=720):
     '''
     Args:
         mdp (MDP)
@@ -395,14 +512,18 @@ def visualize_interaction(mdp, draw_state, cur_state=None, scr_width=720, scr_he
 
         # Check for key presses.
         for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            if event.type == QUIT or (event.type == KEYDOWN
+                                      and event.key == K_ESCAPE):
                 # Quit.
                 pygame.quit()
                 sys.exit()
             if event.type == KEYDOWN and event.key in keys:
                 action = actions[keys.index(event.key)]
                 reward, cur_state = mdp.execute_agent_action(action=action)
-                agent_shape = draw_state(screen, mdp, cur_state, agent_shape=agent_shape)
+                agent_shape = draw_state(screen,
+                                         mdp,
+                                         cur_state,
+                                         agent_shape=agent_shape)
 
                 # Update state text.
                 # _draw_lower_left_text(cur_state, screen)
@@ -410,14 +531,23 @@ def visualize_interaction(mdp, draw_state, cur_state=None, scr_width=720, scr_he
         if cur_state.is_terminal():
             # Done! Agent found goal. Not if the state is lava!! (Tofix)
             goal_text = "Victory!"
-            goal_text_rendered = title_font.render(goal_text, True, (246, 207, 106))
-            goal_text_point = scr_width / 2.0 - (len(goal_text)*7), 18*scr_height / 20.0
+            goal_text_rendered = title_font.render(goal_text, True,
+                                                   (246, 207, 106))
+            goal_text_point = scr_width / 2.0 - (len(goal_text) *
+                                                 7), 18 * scr_height / 20.0
             screen.blit(goal_text_rendered, goal_text_point)
             done = True
 
         pygame.display.update()
 
-def _vis_init(screen, mdp, draw_state, cur_state, agent=None, value=None, score=-1):
+
+def _vis_init(screen,
+              mdp,
+              draw_state,
+              cur_state,
+              agent=None,
+              value=None,
+              score=-1):
     # Pygame setup.
     pygame.init()
     screen.fill((255, 255, 255))
@@ -425,12 +555,20 @@ def _vis_init(screen, mdp, draw_state, cur_state, agent=None, value=None, score=
     done = False
 
     # if score != -1:
-        # _draw_lower_left_text("Score: " + str(score), screen)
-    agent_shape = draw_state(screen=screen, grid_mdp=mdp, value=value, state=cur_state, agent=agent, show_value=True, draw_statics=True)
+    # _draw_lower_left_text("Score: " + str(score), screen)
+    agent_shape = draw_state(screen=screen,
+                             grid_mdp=mdp,
+                             value=value,
+                             state=cur_state,
+                             agent=agent,
+                             show_value=True,
+                             draw_statics=True)
 
     return agent_shape
 
-def convert_x_y_to_grid_cell(x, y, scr_width, scr_height, mdp_width, mdp_height):
+
+def convert_x_y_to_grid_cell(x, y, scr_width, scr_height, mdp_width,
+                             mdp_height):
     '''
     Args:
         x (int)
@@ -440,13 +578,14 @@ def convert_x_y_to_grid_cell(x, y, scr_width, scr_height, mdp_width, mdp_height)
         num
     '''
     width_buffer = scr_width / 10.0
-    height_buffer = 30 + (scr_height / 10.0) # Add 30 for title.
+    height_buffer = 30 + (scr_height / 10.0)  # Add 30 for title.
 
     lower_left_x, lower_left_y = x - width_buffer, scr_height - y - height_buffer
-    
+
     cell_width = (scr_width - width_buffer * 2) / mdp_width
     cell_height = (scr_height - height_buffer * 2) / mdp_height
 
-    cell_x, cell_y = int(lower_left_x / cell_width) + 1, int(lower_left_y / cell_height) + 1
+    cell_x, cell_y = int(lower_left_x / cell_width) + 1, int(
+        lower_left_y / cell_height) + 1
 
     return cell_x, cell_y
