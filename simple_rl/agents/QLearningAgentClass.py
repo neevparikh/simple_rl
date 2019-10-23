@@ -3,7 +3,6 @@
 # Python imports.
 import random
 import numpy
-import time
 from collections import defaultdict
 
 # Other imports.
@@ -177,7 +176,6 @@ class QLearningAgent(Agent):
                 1 - self.alpha) * prev_q_val + self.alpha * (
                     reward + self.gamma * max_q_curr_state)
 
-
     def _anneal(self):
         # Taken from "Note on learning rate schedules for stochastic optimization, by Darken and Moody (Yale)":
         self.alpha = self.alpha_init / (1.0 + (self.step_number / 1000.0) *
@@ -260,12 +258,12 @@ class QLearningAgent(Agent):
             mass associated with the i-th action (indexing into self.actions)
         '''
         all_q_vals = []
-        for i, action in enumerate(self.actions):
+        for _, action in enumerate(self.actions):
             all_q_vals.append(self.get_q_value(state, action))
 
         # Softmax distribution.
-        total = sum([numpy.exp(beta * qv) for qv in all_q_vals])
-        softmax = [numpy.exp(beta * qv) / total for qv in all_q_vals]
+        total = sum([numpy.exp(qv/beta) for qv in all_q_vals])
+        softmax = [numpy.exp(qv/beta) / total for qv in all_q_vals]
 
         return softmax
 
