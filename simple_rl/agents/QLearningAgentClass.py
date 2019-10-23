@@ -262,8 +262,8 @@ class QLearningAgent(Agent):
             all_q_vals.append(self.get_q_value(state, action))
 
         # Softmax distribution.
-        total = sum([numpy.exp(qv/beta) for qv in all_q_vals])
-        softmax = [numpy.exp(qv/beta) / total for qv in all_q_vals]
+        total = sum([numpy.exp(qv / beta) for qv in all_q_vals])
+        softmax = [numpy.exp(qv / beta) / total for qv in all_q_vals]
 
         return softmax
 
