@@ -170,7 +170,8 @@ def main():
 
     ql_agent = QLearningAgent(mdp.get_actions(),
                               epsilon=args.epsilon,
-                              alpha=args.alpha, 
+                              alpha=args.alpha,
+                              gamma=args.gamma,
                               explore=args.explore, 
                               anneal=args.anneal)
     viz = args.mode
