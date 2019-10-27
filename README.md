@@ -6,7 +6,7 @@ There are loads of other great libraries out there for RL. The aim of this one i
 1. Simplicity.
 2. Reproducibility of results.
 
-A brief tutorial for a slightly earlier version is available [here](http://cs.brown.edu/~dabel/blog/posts/simple_rl.html). As of version 0.77, the library should work with both Python 2 and Python 3. Please let me know if you find that is not the case!
+A brief tutorial for a slightly earlier version is available [here](http://cs.brown.edu/~dabel/blog/posts/simple_rl.html). As of version 0.77, the library should work with Python 3. Please let me know if you find that is not the case!
 
 simple_rl requires [numpy](http://www.numpy.org/) and [matplotlib](http://matplotlib.org/). Some MDPs have visuals, too, which requires [pygame](http://www.pygame.org/news). Also includes support for hooking into any of the [Open AI Gym environments](https://gym.openai.com/envs). The library comes along with basic test script, contained in the _tests_ directory. I suggest running it and making sure all tests pass when you install the library.
 
