@@ -180,7 +180,7 @@ def parse_custom_q_table(q_dict, default_q):
     custom_q = defaultdict(lambda: defaultdict(lambda: default_q))
     for state, action_dict in q_dict.items():
         for action, value in action_dict.items():
-            custom_q[GridWorldState(*state)][action] = value
+            custom_q[GridWorldState(*ast.literal_eval(state))][action] = value
     return custom_q
 
 
@@ -215,9 +215,9 @@ def main(open_plot=True):
     # Run experiment and make plot.
     run_agents_on_mdp(agents,
                       mdp,
-                      instances=2,
-                      episodes=60,
-                      steps=200,
+                      instances=1,
+                      episodes=20,
+                      steps=100,
                       open_plot=open_plot,
                       verbose=True)
 
