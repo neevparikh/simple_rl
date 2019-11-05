@@ -37,7 +37,7 @@ color_ls = [[102, 120, 173],[118, 167, 125], \
             [192, 197, 182], [210, 180, 226]]
 
 # Set font.
-font = {'size':14}
+font = {'size': 14}
 matplotlib.rc('font', **font)
 matplotlib.rcParams['pdf.fonttype'] = 42
 
@@ -70,7 +70,9 @@ def load_data(experiment_dir, experiment_agents):
 
         # Put the reward instances into a list of floats.
         for instance in all_reward.readlines():
-            all_episodes_for_instance = [float(r) for r in instance.split(",")[:-1] if len(r) > 0]
+            all_episodes_for_instance = [
+                float(r) for r in instance.split(",")[:-1] if len(r) > 0
+            ]
             if len(all_episodes_for_instance) > 0:
                 all_instances.append(all_episodes_for_instance)
 
@@ -90,7 +92,9 @@ def average_data(data, cumulative=False):
     '''
     num_algorithms = len(data)
 
-    result = [None for i in range(num_algorithms)] # [Alg][avgRewardEpisode], where avg is summed up to episode i if @cumulative=True
+    result = [
+        None for i in range(num_algorithms)
+    ]  # [Alg][avgRewardEpisode], where avg is summed up to episode i if @cumulative=True
 
     for i, all_instances in enumerate(data):
 
@@ -100,8 +104,10 @@ def average_data(data, cumulative=False):
         try:
             avged = all_instances_sum / num_instances
         except TypeError:
-            raise ValueError("(simple_rl) Plotting Error: an algorithm was run with inconsistent parameters (likely inconsistent number of Episodes/Instances. Try clearing old data).")
-        
+            raise ValueError(
+                "(simple_rl) Plotting Error: an algorithm was run with inconsistent parameters (likely inconsistent number of Episodes/Instances. Try clearing old data)."
+            )
+
         if cumulative:
             # If we're summing over episodes.
             temp = []
@@ -116,6 +122,7 @@ def average_data(data, cumulative=False):
 
     return result
 
+
 def compute_conf_intervals(data, cumulative=False):
     '''
     Args:
@@ -123,7 +130,7 @@ def compute_conf_intervals(data, cumulative=False):
         cumulative (bool) *opt
     '''
 
-    confidence_intervals_each_alg = [] # [alg][conf_inv_for_episode]
+    confidence_intervals_each_alg = []  # [alg][conf_inv_for_episode]
 
     for i, all_instances in enumerate(data):
 
@@ -161,7 +168,7 @@ def compute_single_conf_interval(datum):
         (float): Margin of error.
     '''
     std_deviation = np.std(datum)
-    std_error = 1.96*(std_deviation / math.sqrt(len(datum)))
+    std_error = 1.96 * (std_deviation / math.sqrt(len(datum)))
 
     return std_error
 
@@ -170,11 +177,23 @@ def _format_title(plot_title):
     plot_title = plot_title.replace("_", " ")
     plot_title = plot_title.replace("-", " ")
     if len(plot_title.split(" ")) > 1:
-        plot_title_final = " ".join([w[0].upper() + w[1:] for w in plot_title.strip().split(" ")])
+        plot_title_final = " ".join(
+            [w[0].upper() + w[1:] for w in plot_title.strip().split(" ")])
 
     return plot_title_final
 
-def plot(results, experiment_dir, agents, plot_file_name="", conf_intervals=[], use_cost=False, cumulative=False, episodic=True, open_plot=True, track_disc_reward=False, add_legend=True):
+
+def plot(results,
+         experiment_dir,
+         agents,
+         plot_file_name="",
+         conf_intervals=[],
+         use_cost=False,
+         cumulative=False,
+         episodic=True,
+         open_plot=True,
+         track_disc_reward=False,
+         add_legend=True):
     '''
     Args:
         results (list of lists): each element is itself the reward from an episode for an algorithm.
@@ -199,7 +218,7 @@ def plot(results, experiment_dir, agents, plot_file_name="", conf_intervals=[], 
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     # Some nice markers and colors for plotting.
-    markers = ['o', 's', 'D', '^', '*', 'x', 'p', '+', 'v','|']
+    markers = ['o', 's', 'D', '^', '*', 'x', 'p', '+', 'v', '|']
 
     x_axis_unit = "episode" if episodic else "step"
 
@@ -222,34 +241,49 @@ def plot(results, experiment_dir, agents, plot_file_name="", conf_intervals=[], 
     for i, agent_name in enumerate(agents):
 
         # Add figure for this algorithm.
-        agent_color_index = i if agent_name not in agent_colors else agent_colors[agent_name]
+        agent_color_index = i if agent_name not in agent_colors else agent_colors[
+            agent_name]
         agent_marker_index = agent_color_index
-        
+
         # Grab new color/marker if we've gone over.
         if agent_color_index >= len(colors):
             agent_color_index = agent_color_index % len(colors)
         if agent_marker_index >= len(markers):
             agent_marker_index = agent_marker_index % len(markers)
-        
+
         series_color = colors[agent_color_index]
         series_marker = markers[agent_marker_index]
         y_axis = results[i]
-        x_axis = list(drange(X_AXIS_START_VAL, X_AXIS_START_VAL + len(y_axis) * X_AXIS_INCREMENT, X_AXIS_INCREMENT))
+        x_axis = list(
+            drange(X_AXIS_START_VAL,
+                   X_AXIS_START_VAL + len(y_axis) * X_AXIS_INCREMENT,
+                   X_AXIS_INCREMENT))
 
         # Plot Confidence Intervals.
         if conf_intervals != []:
             alg_conf_interv = conf_intervals[i]
             top = np.add(y_axis, alg_conf_interv)
             bot = np.subtract(y_axis, alg_conf_interv)
-            pyplot.fill_between(x_axis, top, bot, facecolor=series_color, edgecolor=series_color, alpha=0.25)
-        print("\t" + str(agents[i]) + ":", round(y_axis[-1], 5) , "(conf_interv:", round(alg_conf_interv[-1], 2), ")")
+            pyplot.fill_between(x_axis,
+                                top,
+                                bot,
+                                facecolor=series_color,
+                                edgecolor=series_color,
+                                alpha=0.25)
+        print("\t" + str(agents[i]) + ":", round(y_axis[-1], 5),
+              "(conf_interv:", round(alg_conf_interv[-1], 2), ")")
 
         marker_every = max(int(len(y_axis) / 30), 1)
-        pyplot.plot(x_axis, y_axis, color=series_color, marker=series_marker, markevery=marker_every, label=agent_name)
+        pyplot.plot(x_axis,
+                    y_axis,
+                    color=series_color,
+                    marker=series_marker,
+                    markevery=marker_every,
+                    label=agent_name)
         if add_legend:
             pyplot.legend()
     print()
-    
+
     # Configure plot naming information.
     unit = "Cost" if use_cost else "Reward"
     plot_label = "Cumulative" if cumulative else "Average"
@@ -266,31 +300,38 @@ def plot(results, experiment_dir, agents, plot_file_name="", conf_intervals=[], 
     else:
         exp_name = exp_dir_split_list[0]
     experiment_dir = os.path.join(experiment_dir, "")
-    plot_file_name = os.path.join(experiment_dir, plot_file_name + ".pdf") if plot_file_name != "" else experiment_dir + plot_label.lower() + "_" + unit.lower() + ".pdf"
+    plot_file_name = os.path.join(
+        experiment_dir, plot_file_name +
+        ".pdf") if plot_file_name != "" else experiment_dir + plot_label.lower(
+        ) + "_" + unit.lower() + ".pdf"
     plot_title = CUSTOM_TITLE if CUSTOM_TITLE is not None else plot_label + " " + disc_ext + unit + ": " + exp_name
     if CUSTOM_TITLE is None:
         plot_title = _format_title(plot_title)
 
     # Axis labels.
-    x_axis_label = X_AXIS_LABEL if X_AXIS_LABEL is not None else x_axis_unit[0].upper() + x_axis_unit[1:] + " Number"
+    x_axis_label = X_AXIS_LABEL if X_AXIS_LABEL is not None else x_axis_unit[
+        0].upper() + x_axis_unit[1:] + " Number"
     y_axis_label = Y_AXIS_LABEL if Y_AXIS_LABEL is not None else plot_label + " " + unit
-    
+
     if not Y_AXIS_END_VAL in [0, None]:
         pyplot.ylim((0, Y_AXIS_END_VAL))
-    
+
     # Pyplot calls.
     pyplot.xlabel(x_axis_label)
     if EVERY_OTHER_X:
-        pyplot.xticks(range(X_AXIS_START_VAL, len(x_axis) * X_AXIS_INCREMENT + X_AXIS_START_VAL, X_AXIS_INCREMENT * 2))
+        pyplot.xticks(
+            range(X_AXIS_START_VAL,
+                  len(x_axis) * X_AXIS_INCREMENT + X_AXIS_START_VAL,
+                  X_AXIS_INCREMENT * 2))
 
     pyplot.ylabel(y_axis_label)
     pyplot.title(plot_title)
     pyplot.grid(True)
-    pyplot.tight_layout() # Keeps the spacing nice.
+    pyplot.tight_layout()  # Keeps the spacing nice.
 
     # Save the plot.
     pyplot.savefig(plot_file_name, format="pdf")
-    
+
     if open_plot:
         # Open it.
         open_prefix = "xdg-" if sys.platform == "linux" or sys.platform == "linux2" else ""
@@ -300,7 +341,19 @@ def plot(results, experiment_dir, agents, plot_file_name="", conf_intervals=[], 
     pyplot.cla()
     pyplot.close()
 
-def make_plots(experiment_dir, experiment_agents, plot_file_name="", cumulative=True, use_cost=False, episodic=True, open_plot=True, track_disc_reward=False, new_title=None, new_x_label=None, new_y_label=None, add_legend=True):
+
+def make_plots(experiment_dir,
+               experiment_agents,
+               plot_file_name="",
+               cumulative=True,
+               use_cost=False,
+               episodic=True,
+               open_plot=True,
+               track_disc_reward=False,
+               new_title=None,
+               new_x_label=None,
+               new_y_label=None,
+               add_legend=True):
     '''
     Args:
         experiment_dir (str): path to results.
@@ -330,7 +383,8 @@ def make_plots(experiment_dir, experiment_agents, plot_file_name="", cumulative=
         Y_AXIS_LABEL = new_y_label
 
     # Load the data.
-    data = load_data(experiment_dir, experiment_agents) # [alg][instance][episode]
+    data = load_data(experiment_dir,
+                     experiment_agents)  # [alg][instance][episode]
 
     # Average the data.
     avg_data = average_data(data, cumulative=cumulative)
@@ -339,15 +393,18 @@ def make_plots(experiment_dir, experiment_agents, plot_file_name="", cumulative=
     conf_intervals = compute_conf_intervals(data, cumulative=cumulative)
 
     # Create plot.
-    plot(avg_data, experiment_dir, experiment_agents,
-                plot_file_name=plot_file_name,
-                conf_intervals=conf_intervals,
-                use_cost=use_cost,
-                cumulative=cumulative,
-                episodic=episodic,
-                open_plot=open_plot,
-                track_disc_reward=track_disc_reward,
-                add_legend=add_legend)
+    plot(avg_data,
+         experiment_dir,
+         experiment_agents,
+         plot_file_name=plot_file_name,
+         conf_intervals=conf_intervals,
+         use_cost=use_cost,
+         cumulative=cumulative,
+         episodic=episodic,
+         open_plot=open_plot,
+         track_disc_reward=track_disc_reward,
+         add_legend=add_legend)
+
 
 def drange(x_min, x_max, x_increment):
     '''
@@ -368,6 +425,7 @@ def drange(x_min, x_max, x_increment):
         yield float(x_min)
         x_min += decimal.Decimal(str(x_increment))
 
+
 def _get_agent_names(data_dir):
     '''
     Args:
@@ -379,10 +437,16 @@ def _get_agent_names(data_dir):
     from simple_rl.experiments import Experiment
 
     try:
-        params_file = open(os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME), "r")
+        params_file = open(
+            os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME), "r")
     except IOError:
         # No param file.
-        return [agent_file.replace(".csv", "") for agent_file in os.listdir(data_dir) if os.path.isfile(os.path.join(data_dir, agent_file)) and ".csv" in agent_file]
+        return [
+            agent_file.replace(".csv", "")
+            for agent_file in os.listdir(data_dir)
+            if os.path.isfile(os.path.join(data_dir, agent_file))
+            and ".csv" in agent_file
+        ]
 
     agent_names = []
     agent_flag = False
@@ -401,6 +465,7 @@ def _get_agent_names(data_dir):
 
     return agent_names
 
+
 def _get_agent_colors(data_dir, agents):
     '''
     Args:
@@ -413,10 +478,11 @@ def _get_agent_colors(data_dir, agents):
     from simple_rl.experiments import Experiment
 
     try:
-        params_file = open(os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME), "r")
+        params_file = open(
+            os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME), "r")
     except IOError:
         # No param file.
-        return {agent : i for i, agent in enumerate(agents)}
+        return {agent: i for i, agent in enumerate(agents)}
 
     colors = {}
 
@@ -428,6 +494,7 @@ def _get_agent_colors(data_dir, agents):
 
     return colors
 
+
 def _is_episodic(data_dir):
     '''
     Returns:
@@ -436,17 +503,22 @@ def _is_episodic(data_dir):
     from simple_rl.experiments import Experiment
 
     # Open param file for the experiment.
-    if not os.path.exists(os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME)):
-        print("Warning: no experiment parameters file found for experiment. Assuming non-episodic.")
+    if not os.path.exists(
+            os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME)):
+        print(
+            "Warning: no experiment parameters file found for experiment. Assuming non-episodic."
+        )
         return False
 
-    params_file = open(os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME), "r")
+    params_file = open(os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME),
+                       "r")
 
     # Check if episodes > 1.
     for line in params_file.readlines():
         if "episodes" in line:
             vals = line.strip().split(":")
             return int(vals[1]) > 1
+
 
 def _is_disc_reward(data_dir):
     '''
@@ -456,11 +528,15 @@ def _is_disc_reward(data_dir):
     from simple_rl.experiments import Experiment
 
     # Open param file for the experiment.
-    if not os.path.exists(os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME)):
-        print("Warning: no experiment parameters file found for experiment. Assuming non-episodic.")
+    if not os.path.exists(
+            os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME)):
+        print(
+            "Warning: no experiment parameters file found for experiment. Assuming non-episodic."
+        )
         return False
 
-    params_file = open(os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME), "r")
+    params_file = open(os.path.join(data_dir, Experiment.EXP_PARAM_FILE_NAME),
+                       "r")
 
     # Check if episodes > 1.
     for line in params_file.readlines():
@@ -471,14 +547,21 @@ def _is_disc_reward(data_dir):
 
     return False
 
+
 def parse_args():
     '''
     Summary:
         Parses two arguments, 'dir' (directory pointer) and 'a' (bool to indicate avg. plot).
     '''
     parser = argparse.ArgumentParser()
-    parser.add_argument("-dir", type = str, help = "Path to relevant csv files of data.")
-    parser.add_argument("-a", type = bool, default=False, help = "If true, plots average reward (default is cumulative).")
+    parser.add_argument("-dir",
+                        type=str,
+                        help="Path to relevant csv files of data.")
+    parser.add_argument(
+        "-a",
+        type=bool,
+        default=False,
+        help="If true, plots average reward (default is cumulative).")
     return parser.parse_args()
 
 
@@ -498,7 +581,7 @@ def format_and_make_plot(data_dir, avg_plot=False, add_legend=True):
     if data_dir[-1] != "/":
         data_dir = data_dir + "/"
 
-    cumulative = not(avg_plot)
+    cumulative = not (avg_plot)
     episodic = _is_episodic(data_dir)
     track_disc_reward = _is_disc_reward(data_dir)
     plot_file_name = ""
@@ -513,19 +596,27 @@ def format_and_make_plot(data_dir, avg_plot=False, add_legend=True):
         cumulative = False
 
     # Plot.
-    make_plots(data_dir, agent_names, cumulative=cumulative, episodic=episodic, plot_file_name=plot_file_name, track_disc_reward=track_disc_reward, add_legend=add_legend)
+    make_plots(data_dir,
+               agent_names,
+               cumulative=cumulative,
+               episodic=episodic,
+               plot_file_name=plot_file_name,
+               track_disc_reward=track_disc_reward,
+               add_legend=add_legend)
+
 
 def main():
     '''
     Summary:
         For manual plotting.
     '''
-    
+
     # Parse args.
     args = parse_args()
 
     # Run.
     format_and_make_plot(data_dir=args.dir, avg_plot=args.a)
+
 
 if __name__ == "__main__":
     main()
