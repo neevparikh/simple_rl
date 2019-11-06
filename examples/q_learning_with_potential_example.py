@@ -9,6 +9,7 @@ import ast
 # Other imports.
 from simple_rl.agents import QLearningAgent, RMaxAgent, RandomAgent
 from simple_rl.tasks import GridWorldMDP
+from simple_rl.planning import ValueIteration
 from simple_rl.tasks.grid_world.GridWorldStateClass import GridWorldState
 from simple_rl.run_experiments import run_agents_on_mdp
 from collections import defaultdict
@@ -125,6 +126,10 @@ def parse_args():
         default=0.95,
         help='a float representing the decay factor for environment')
     parser.add_argument(
+        '--visualize',
+        action='store_true',
+        help='to visualize the gridworld')
+    parser.add_argument(
         '-ag',
         '--agents',
         type=ast.literal_eval,
@@ -149,9 +154,10 @@ def parse_args():
         const={},
         default={},
         help=
-        "a nested dictionary of the form {'(x,y)': {'action': value}}. Valid states are \
-                (x,y) tuples representing the x,y cell of the gridworld (remember one indexed) \
-                 and valid actions are 'right', 'left', 'up', 'down'. Values must be a float"
+        "a nested dictionary of the form {'(x,y)': {'action': value}}. Valid \
+        states are (x,y) tuples representing the x,y cell of the gridworld \
+        (remember one indexed) and valid actions are 'right', 'left', 'up', \
+        'down'. Values must be a float"
     )
 
     args = parser.parse_args()
@@ -192,34 +198,41 @@ def main(open_plot=True):
     mdp = generate_MDP(args.width, args.height, args.i_loc, args.g_loc,
                        args.l_loc, args.gamma, args.Walls, args.slip)
 
-    # Initialize the custom Q function for a q-learning agent. This should be
-    # equivalent to potential shaping.
-    # This should cause the Q agent to learn more quickly.
 
-    custom_q = parse_custom_q_table(args.custom_q, args.default_q)
 
-    agents = []
-    for agent in args.agents:
-        if agent == 'q_learning':
-            agents.append(QLearningAgent(actions=mdp.get_actions()))
-        elif agent == 'potential_q':
-            agents.append(
-                QLearningAgent(actions=mdp.get_actions(),
-                               custom_q_init=custom_q,
-                               name="Potential_Q"))
-        elif agent == 'random':
-            agents.append(RandomAgent(actions=mdp.get_actions()))
-        elif agent == 'rmax':
-            agents.append(RMaxAgent(mdp.get_actions()))
+    if args.visualize:
+        value_iter = ValueIteration(mdp)
+        value_iter.run_vi()
+        mdp.visualize_policy_values(
+            (lambda state: value_iter.policy(state)),
+            (lambda state: value_iter.value_func[state]))
 
-    # Run experiment and make plot.
-    run_agents_on_mdp(agents,
-                      mdp,
-                      instances=1,
-                      episodes=20,
-                      steps=100,
-                      open_plot=open_plot,
-                      verbose=True)
+
+    else:
+        custom_q = parse_custom_q_table(args.custom_q, args.default_q)
+
+        agents = []
+        for agent in args.agents:
+            if agent == 'q_learning':
+                agents.append(QLearningAgent(actions=mdp.get_actions()))
+            elif agent == 'potential_q':
+                agents.append(
+                    QLearningAgent(actions=mdp.get_actions(),
+                                   custom_q_init=custom_q,
+                                   name="Potential_Q"))
+            elif agent == 'random':
+                agents.append(RandomAgent(actions=mdp.get_actions()))
+            elif agent == 'rmax':
+                agents.append(RMaxAgent(mdp.get_actions()))
+
+        # Run experiment and make plot.
+        run_agents_on_mdp(agents,
+                          mdp,
+                          instances=1,
+                          episodes=20,
+                          steps=100,
+                          open_plot=open_plot,
+                          verbose=True)
 
 
 if __name__ == "__main__":
