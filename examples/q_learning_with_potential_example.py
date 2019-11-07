@@ -229,7 +229,7 @@ def main(open_plot=True):
         run_agents_on_mdp(agents,
                           mdp,
                           instances=1,
-                          episodes=20,
+                          episodes=100,
                           steps=100,
                           open_plot=open_plot,
                           verbose=True)
