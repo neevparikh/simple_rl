@@ -15,7 +15,7 @@ class MonkeyPlayroomObject(object):
     def _get_actions(self):
         # return actions
         return [
-            method + '_' + self.name for method in dir(self)
+             self.name + '_' + method for method in dir(self)
             if method[0] != '_'
         ]
 

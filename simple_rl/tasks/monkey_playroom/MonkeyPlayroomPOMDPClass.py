@@ -3,7 +3,6 @@ from collections import defaultdict
 
 # Other imports.
 from simple_rl.pomdp.POMDPClass import POMDP
-from simple_rl.tasks.monkey_playroom.MonkeyPlayroomStateClass import MonkeyPlayroomState
 from simple_rl.tasks.monkey_playroom.MonkeyPlayroomObjectClass import Robot, Light, Ball, Monkey, Box, MusicPlayer, Bell
 
 
@@ -12,8 +11,6 @@ class MonkeyPlayroomPOMDP(POMDP):
     def __init__(self, num_rooms):
         # format: for each in set of objects, maintain a list of instances
         # each having attributes
-
-        self.OBSERVATIONS = ['']
 
         self.cur_state = {
             'light0': Light('light0', False, 0),
@@ -30,29 +27,40 @@ class MonkeyPlayroomPOMDP(POMDP):
             'box2': Box('box2', False, 0)
         }
 
+        self.num_rooms = num_rooms
+
         self.ACTIONS = [obj._get_actions() for obj in self.cur_state.values()]  # pylint: disable=protected-access
         self.ACTIONS = list(
             set([action for actions in self.ACTIONS for action in actions]))
 
-        self.num_rooms = num_rooms
+        self.OBSERVATIONS = []
+
+        for room in range(num_rooms):
+            in_room = []
+            for k,v in self.cur_state.items():
+                if k != 'robot' and v.room == room:
+                    in_room.append(k)
+            self.OBSERVATIONS.append("_".join(in_room))
+                        
+
         tmp_obj = self.cur_state
         self._states = []
         for k, v in tmp_obj.items():
             for tog in [0, 1]:
                 v.toggled = tog
                 tmp_obj[k] = v
-                self._states.append(MonkeyPlayroomState(tmp_obj))
+                self._states.append(tmp_obj)
             if k == 'robot':
                 for room in range(num_rooms):
                     v.room = room
                     tmp_obj[k] = v
-                    self._states.append(MonkeyPlayroomState(tmp_obj))
+                    self._states.append(tmp_obj)
             if k == 'ball':
                 for k2, _ in tmp_obj.items():
                     if k2 != k:
                         v.object_in_contact = k2
                         tmp_obj[k] = v
-                        self._states.append(MonkeyPlayroomState(tmp_obj))
+                        self._states.append(tmp_obj)
 
         # Initial belief is a uniform distribution over states
         b0 = defaultdict()
@@ -66,19 +74,25 @@ class MonkeyPlayroomPOMDP(POMDP):
     def _transition_func(self, state, action):
         '''
         Args:
-            state (MonkeyPlayroomState)
+            state (dict)
             action (str)
 
         Returns:
-            next_state (MonkeyPlayroomState)
+            next_state (dict)
         '''
-
-        raise ValueError(
-            'Invalid state: {} action: {} in MonkeyPlayroom'.format(
-                state, action))
+        split = action.split("_")
+        getattr(state[split[0]], "_".join(split[1]))()
+        return state.copy()
+        
 
     def _observation_func(self, state, action):
-        pass
+        next_state = self._transition_func(state, action)
+        cur_room = next_state['robot'].room
+        in_room = []
+        for k,v in next_state.items():
+            if k != 'robot' and v.room == cur_room:
+                in_room.append(k)
+        return "_".join(in_room)
 
     def _reward_func(self, state, action, next_state):  # pylint: disable=unused-argument
         if next_state['monkey'].toggled:
