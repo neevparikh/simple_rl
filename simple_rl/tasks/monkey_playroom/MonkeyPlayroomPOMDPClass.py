@@ -3,12 +3,13 @@ from collections import defaultdict
 
 # Other imports.
 from simple_rl.pomdp.POMDPClass import POMDP
-from simple_rl.tasks.monkey_playroom.MonkeyPlayroomObjectClass import Robot, Light, Ball, Monkey, Box, MusicPlayer, Bell
+from simple_rl.tasks.monkey_playroom.MonkeyPlayroomObjectClass import Robot, \
+        Light, Ball, Monkey, Box, MusicPlayer, Bell
 
 
 class MonkeyPlayroomPOMDP(POMDP):
     ''' Class for a Monkey Playroom POMDP '''
-    def __init__(self, num_rooms):
+    def __init__(self, num_rooms, cur_state=None):
         # format: for each in set of objects, maintain a list of instances
         # each having attributes
 
@@ -37,11 +38,10 @@ class MonkeyPlayroomPOMDP(POMDP):
 
         for room in range(num_rooms):
             in_room = []
-            for k,v in self.cur_state.items():
+            for k, v in self.cur_state.items():
                 if k != 'robot' and v.room == room:
                     in_room.append(k)
             self.OBSERVATIONS.append("_".join(in_room))
-                        
 
         tmp_obj = self.cur_state
         self._states = []
@@ -83,13 +83,14 @@ class MonkeyPlayroomPOMDP(POMDP):
         split = action.split("_")
         getattr(state[split[0]], "_".join(split[1]))()
         return state.copy()
-        
 
     def _observation_func(self, state, action):
         next_state = self._transition_func(state, action)
         cur_room = next_state['robot'].room
         in_room = []
-        for k,v in next_state.items():
+        for k, v in next_state.items():
+            if k[:5] == 'light' and not v.object_state:
+                return None
             if k != 'robot' and v.room == cur_room:
                 in_room.append(k)
         return "_".join(in_room)
@@ -98,7 +99,7 @@ class MonkeyPlayroomPOMDP(POMDP):
         if next_state['monkey'].toggled:
             return 1
         else:
-            return -0.05
+            return -0.01
 
     def get_all_agent_states(self):
         return self._states
