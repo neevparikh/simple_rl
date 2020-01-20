@@ -41,6 +41,9 @@ class PartialOrderPlanner(Planner):
         self.delayed_agenda = set()
         self.links = {}
 
+    # def find(self, f):
+
+
     def _check_consistency(self, new_action, prev_action):
         return not new_action.action_name in self.ordering[
             prev_action.action_name]

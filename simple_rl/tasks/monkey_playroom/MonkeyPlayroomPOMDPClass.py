@@ -1,12 +1,13 @@
 # Python imports.
 from collections import defaultdict
 from random import choice, seed
+
 seed(10)
 
 # Other imports.
 from simple_rl.pomdp.POMDPClass import POMDP
 from simple_rl.tasks.monkey_playroom.MonkeyPlayroomObjectClass import Robot, \
-        Light, Ball, Monkey, Box, MusicPlayer, Bell
+    Light, Ball, Monkey, Box, MusicPlayer, Bell
 
 
 class MonkeyPlayroomState():
@@ -19,6 +20,7 @@ class MonkeyPlayroomState():
 
 class MonkeyPlayroomPOMDP(POMDP):
     ''' Class for a Monkey Playroom POMDP '''
+
     def __init__(self, num_rooms, cur_state=None):
         # format: for each in set of objects, maintain a list of instances
         # each having attributes
@@ -26,29 +28,29 @@ class MonkeyPlayroomPOMDP(POMDP):
         if not cur_state:
             self.cur_state = MonkeyPlayroomState({
                 'light0':
-                Light('light0', False, 0),
+                    Light('light0', False, 0),
                 'light1':
-                Light('light1', False, 1),
+                    Light('light1', False, 1),
                 'light2':
-                Light('light2', False, 2),
+                    Light('light2', False, 2),
                 'light3':
-                Light('light3', False, 3),
+                    Light('light3', False, 3),
                 'musicplayer':
-                MusicPlayer('musicplayer', False, 1),
+                    MusicPlayer('musicplayer', False, 1),
                 'bell':
-                Bell('bell', False, 2),
+                    Bell('bell', False, 2),
                 'monkey':
-                Monkey('monkey', False, 3),
+                    Monkey('monkey', False, 3),
                 'robot':
-                Robot('robot', True, 0),
+                    Robot('robot', True, 0),
                 'ball':
-                Ball('ball', False, 0),
+                    Ball('ball', False, 0),
                 'box0':
-                Box('box0', False, 0),
+                    Box('box0', False, 0),
                 'box1':
-                Box('box1', False, 0),
+                    Box('box1', False, 0),
                 'box2':
-                Box('box2', False, 0)
+                    Box('box2', False, 0)
             })
         else:
             self.cur_state = cur_state
@@ -70,27 +72,6 @@ class MonkeyPlayroomPOMDP(POMDP):
                                   ('ball', 'object_in_contact', 'bell')]
 
         self.num_rooms = num_rooms
-
-        print("Getting actions")
-        self.ACTIONS = [
-            obj._get_actions() for obj in self.cur_state.state_dict.values()
-        ]  # pylint: disable=protected-access
-        self.ACTIONS = list(
-            set([action for actions in self.ACTIONS for action in actions]))
-
-        self.ACTIONS.remove('robot_move_to_room')
-        self.ACTIONS.extend(
-            ['robot_move_to_room_' + str(room) for room in range(num_rooms)])
-
-        print("Getting observations")
-        self.OBSERVATIONS = ["none"]
-
-        for room in range(num_rooms):
-            in_room = []
-            for k, v in self.cur_state.state_dict.items():
-                if k != 'robot' and v.room == room:
-                    in_room.append(k)
-            self.OBSERVATIONS.append("_".join(in_room))
 
         tmp_obj = self.cur_state.state_dict
 
@@ -114,6 +95,86 @@ class MonkeyPlayroomPOMDP(POMDP):
                     v.toggled = tog
                     tmp_obj[k] = v
                     self.states.append(MonkeyPlayroomState(tmp_obj))
+
+        # given a state variable, the sets of states from which it is observable.
+        self.localities = {
+            'light0': [frozenset([state for state in self.states if state.state_dict['robot'].room == 0])],
+            'light1': [frozenset([state for state in self.states if state.state_dict['robot'].room == 1])],
+            'light2': [frozenset([state for state in self.states if state.state_dict['robot'].room == 2])],
+            'light3': [frozenset([state for state in self.states if state.state_dict['robot'].room == 3])],
+            'musicplayer': [frozenset(self.states)],
+            'bell': [frozenset(self.states)],
+            'monkey': [frozenset(self.states)],
+            'robot': [frozenset(self.states)],
+            'ball': [frozenset([state for state in self.states if state.state_dict['robot'].room ==    # in box1
+                                state.state_dict['box0'].room and state.state_dict['box0'].toggled and
+                                state.state_dict['ball'].object_in_contact == 'box0' and
+                                state.state_dict['light' + str(state.state_dict['box0'])]]),
+                     frozenset([state for state in self.states if state.state_dict['robot'].room ==    #in box2
+                                state.state_dict['box1'].room and state.state_dict['box1'].toggled and
+                                state.state_dict['ball'].object_in_contact == 'box1' and
+                                state.state_dict['light' + str(state.state_dict['box1'])]]),
+                     frozenset([state for state in self.states if state.state_dict['robot'].room ==     #in box3
+                                state.state_dict['box2'].room and state.state_dict['box2'].toggled and
+                                state.state_dict['ball'].object_in_contact == 'box2' and
+                                state.state_dict['light' + str(state.state_dict['box1'])]]),
+                     frozenset([state for state in self.states if state.state_dict['robot'].room == 0 and   #room 0 out of box
+                                state.state_dict['ball'].room == 0 and
+                                (state.state_dict['ball'].object_in_contact == 'robot' or
+                                 state.state_dict['ball'].object_in_contact == 'floor')]),
+                     frozenset([state for state in self.states if state.state_dict['robot'].room == 1 and  # room 1
+                                state.state_dict['ball'].room == 1]),
+                     frozenset([state for state in self.states if state.state_dict['robot'].room == 2 and  # room 2
+                                state.state_dict['ball'].room == 2]),
+                     frozenset([state for state in self.states if state.state_dict['robot'].room == 3 and  # room 3
+                                state.state_dict['ball'].room == 3]),
+                     ],
+            'box0': [frozenset([state for state in self.states if state.state_dict['robot'].room ==
+                                state.state_dict['box0'].room and
+                                state.state_dict['light' + str(state.state_dict['box0'])]])],
+            'box1': [frozenset([state for state in self.states if state.state_dict['robot'].room ==
+                                state.state_dict['box1'].room and
+                                state.state_dict['light' + str(state.state_dict['box1'])]])],
+            'box2': [frozenset([state for state in self.states if state.state_dict['robot'].room ==
+                                state.state_dict['box2'].room and
+                                state.state_dict['light' + str(state.state_dict['box2'])]])]
+            }
+
+        self.locbelief = {
+            'light0': [1],
+            'light1': [1],
+            'light2': [1],
+            'light3': [1],
+            'musicplayer': [1],
+            'bell': [1],
+            'monkey': [1],
+            'robot': [1],
+            'ball': [0.3,0.4,0.3,0,0,0,0],
+            'box0': [1],
+            'box1': [1],
+            'box2': [1]
+        }
+        print("Getting actions")
+        self.ACTIONS = [
+            obj._get_actions() for obj in self.cur_state.state_dict.values()
+        ]  # pylint: disable=protected-access
+        self.ACTIONS = list(
+            set([action for actions in self.ACTIONS for action in actions]))
+
+        self.ACTIONS.remove('robot_move_to_room')
+        self.ACTIONS.extend(
+            ['robot_move_to_room_' + str(room) for room in range(num_rooms)])
+
+        print("Getting observations")
+        self.OBSERVATIONS = ["none"]
+
+        for room in range(num_rooms):
+            in_room = []
+        for k, v in self.cur_state.state_dict.items():
+            if
+        k != 'robot' and v.room == room:
+        in_room.append(k)
+        self.OBSERVATIONS.append("_".join(in_room))
 
         print("Initializing beliefs")
         # Initial belief is a uniform distribution over states
@@ -147,7 +208,7 @@ class MonkeyPlayroomPOMDP(POMDP):
         else:
             getattr(state.state_dict[split[0]], "_".join(split[1:]))()
         if action == 'ball_throw' and state.state_dict[
-                'ball'].object_in_contact == 'robot':
+            'ball'].object_in_contact == 'robot':
             state['ball'].object_in_contact = choice(
                 state['ball'].throwable[str(state['robot'].room)])
         if self.is_goal_state_action(state, action):
