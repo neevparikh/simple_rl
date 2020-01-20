@@ -55,12 +55,12 @@ class ValueIteration(Planner):
 
         for s in self.get_states():
             for a in self.actions:
-                stateList = self.transition_prob(s, a)
-                for s_prime in stateList:
-                    self.trans_dict[s][a][s_prime[0]] += s_prime[1]
-#                for sample in range(self.sample_rate):
-#                    s_prime = self.transition_func(s, a)
-#                    self.trans_dict[s][a][s_prime] += 1.0 / self.sample_rate
+                # stateList = self.transition_func(s, a)
+                # for s_prime in stateList:
+                #     self.trans_dict[s][a][s_prime[0]] += s_prime[1]
+                for sample in range(self.sample_rate):
+                    s_prime = self.transition_func(s, a)
+                    self.trans_dict[s][a][s_prime] += 1.0 / self.sample_rate
 
         self.has_computed_matrix = True
 

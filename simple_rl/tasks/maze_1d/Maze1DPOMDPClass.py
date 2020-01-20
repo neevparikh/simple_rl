@@ -71,6 +71,9 @@ class Maze1DPOMDP(POMDP):
             next_state.name == observation == 'goal') else (0. -
                                                             self.step_cost)
 
+    def get_all_agent_states(self):
+        return self._states
+
     def is_in_goal_state(self):
         return self.cur_state.name == 'goal'
 

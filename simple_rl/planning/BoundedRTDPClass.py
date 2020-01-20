@@ -10,15 +10,24 @@ from simple_rl.mdp.MDPClass import MDP
 from simple_rl.mdp.StateClass import State
 from simple_rl.utils.additional_datastructures import SimpleRLStack
 
+
 class BoundedRTDP(Planner):
     '''
-    Bounded Real-Time Dynamic Programming: RTDP with monotone upper bounds and performance guarantees (McMahan et al)
+    Bounded Real-Time Dynamic Programming: RTDP with monotone upper bounds and
+    performance guarantees (McMahan et al)
 
-    The Bounded RTDP solver can produce partial policies with strong performance guarantees while only touching a
-    fraction of the state space, even on problems where other algorithms would have to visit the full state space.
-    To do so, Bounded RTDP maintains both upper and lower bounds on the optimal value function.
+    The Bounded RTDP solver can produce partial policies with strong performance
+    guarantees while only touching a fraction of the state space, even on 
+    problems where other algorithms would have to visit the full state space.
+    To do so, Bounded RTDP maintains both upper and lower bounds on the optimal
+    value function.
     '''
-    def __init__(self, mdp, lower_values_init, upper_values_init, tau=10., name='BRTDP'):
+    def __init__(self,
+                 mdp,
+                 lower_values_init,
+                 upper_values_init,
+                 tau=10.,
+                 name='BRTDP'):
         '''
         Args:
             mdp (MDP): underlying MDP to plan in
@@ -37,7 +46,8 @@ class BoundedRTDP(Planner):
         vi._compute_matrix_from_trans_func()
         self.trans_dict = vi.trans_dict
 
-        self.max_diff = (self.upper_values[self.mdp.init_state] - self.lower_values[self.mdp.init_state]) / tau
+        self.max_diff = (self.upper_values[self.mdp.init_state] -
+                         self.lower_values[self.mdp.init_state]) / tau
 
     # ------------------
     # -- Planning API --
@@ -88,30 +98,42 @@ class BoundedRTDP(Planner):
         trajectory = SimpleRLStack()
         while not state.is_terminal():
             trajectory.push(state)
-            self.upper_values[state] = self._best_qvalue(state, self.upper_values)
+            self.upper_values[state] = self._best_qvalue(
+                state, self.upper_values)
             action = self._greedy_action(state, self.lower_values)
-            self.lower_values[state] = self._qvalue(state, action, self.lower_values)
-            expected_gap_distribution = self._expected_gap_distribution(state, action)
+            self.lower_values[state] = self._qvalue(state, action,
+                                                    self.lower_values)
+            expected_gap_distribution = self._expected_gap_distribution(
+                state, action)
             expected_gap = sum(expected_gap_distribution.values())
-            if verbose: print('{}\tAction: {}\tGap: {}\tMaxDiff: {}'.format(state, action, expected_gap, self.max_diff))
+            if verbose:
+                print('{}\tAction: {}\tGap: {}\tMaxDiff: {}'.format(
+                    state, action, expected_gap, self.max_diff))
             if expected_gap < self.max_diff:
-                if verbose: print('Ending rollouts with gap {} and max_diff {}'.format(expected_gap, self.max_diff))
+                if verbose:
+                    print('Ending rollouts with gap {} and max_diff {}'.format(
+                        expected_gap, self.max_diff))
                 break
-            state = BoundedRTDP._pick_next_state(expected_gap_distribution, expected_gap)
+            state = BoundedRTDP._pick_next_state(expected_gap_distribution,
+                                                 expected_gap)
         while not trajectory.is_empty():
             state = trajectory.pop()
-            self.upper_values[state] = self._best_qvalue(state, self.upper_values)
-            self.lower_values[state] = self._best_qvalue(state, self.lower_values)
+            self.upper_values[state] = self._best_qvalue(
+                state, self.upper_values)
+            self.lower_values[state] = self._best_qvalue(
+                state, self.lower_values)
 
     def _greedy_action(self, state, values):
-        return max([(self._qvalue(state, action, values), action) for action in self.actions])[1]
+        return max([(self._qvalue(state, action, values), action)
+                    for action in self.actions])[1]
 
     def _qvalue(self, state, action, values):
         return self.mdp.reward_func(state, action) + sum([self.trans_dict[state][action][next_state] * values[next_state] \
                                                       for next_state in self.states])
 
     def _best_qvalue(self, state, values):
-        return max([self._qvalue(state, action, values) for action in self.actions])
+        return max(
+            [self._qvalue(state, action, values) for action in self.actions])
 
     # -------------------------
     # -- Convenience Methods --
@@ -131,7 +153,8 @@ class BoundedRTDP(Planner):
         expected_gaps = defaultdict()
         for next_state in self.states:
             gap = self.upper_values[next_state] - self.lower_values[next_state]
-            expected_gaps[next_state] = self.trans_dict[state][action][next_state] * gap
+            expected_gaps[
+                next_state] = self.trans_dict[state][action][next_state] * gap
         return expected_gaps
 
     @staticmethod
@@ -148,5 +171,6 @@ class BoundedRTDP(Planner):
             for state in _distribution:
                 _distribution[state] *= scaling_factor
             return _distribution
+
         scaled_distribution = _scale_distribution(distribution, expected_gap)
         return max(scaled_distribution, key=scaled_distribution.get)

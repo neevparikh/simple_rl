@@ -33,11 +33,12 @@ class BeliefSparseSampling(object):
         self.horizon = self._horizon
         self.width = self._width
 
-        print('BSS Horizon = {} \t Width = {}'.format(self.horizon, self.width))
+        print('BSS Horizon = {} \t Width = {}'.format(self.horizon,
+                                                      self.width))
 
         self.name = name
         self.root_level_qvals = defaultdict()
-        self.nodes_by_horizon  = defaultdict(lambda: defaultdict(float))
+        self.nodes_by_horizon = defaultdict(lambda: defaultdict(float))
 
     @property
     def _horizon(self):
@@ -55,14 +56,15 @@ class BeliefSparseSampling(object):
         Returns:
              _width (int)
         '''
-        part1 = (self._vmax ** 2) / (self._lam ** 2)
-        part2 = 2 * self._horizon * log(self._horizon * (self._vmax ** 2) / (self._lam ** 2))
+        part1 = (self._vmax**2) / (self._lam**2)
+        part2 = 2 * self._horizon * log(self._horizon * (self._vmax**2) /
+                                        (self._lam**2))
         part3 = log(self.max_reward / self._lam)
         return int(part1 * (part2 + part3))
 
     @property
     def _lam(self):
-        return (self.tol * (1.0 - self.gamma) ** 2) / 4.0
+        return (self.tol * (1.0 - self.gamma)**2) / 4.0
 
     @property
     def _vmax(self):
@@ -76,7 +78,7 @@ class BeliefSparseSampling(object):
         Returns:
             width (int): the decayed branching factor for a state, action pair
         '''
-        c = int(self.width * (self.gamma ** (2 * height)))
+        c = int(self.width * (self.gamma**(2 * height)))
         return c if c > 1 else 1
 
     def _estimate_qs(self, state, horizon):
@@ -85,7 +87,8 @@ class BeliefSparseSampling(object):
             if horizon <= 0:
                 qvalues[action_idx] = 0.0
             else:
-                qvalues[action_idx] = self._sampled_q_estimate(state, action, horizon)
+                qvalues[action_idx] = self._sampled_q_estimate(
+                    state, action, horizon)
         return qvalues
 
     def _sampled_q_estimate(self, state, action, horizon):
@@ -102,7 +105,8 @@ class BeliefSparseSampling(object):
         width = self._get_width_at_height(self.horizon - horizon)
         for _ in range(width):
             next_state = self.gen_model.transition_func(state, action)
-            total += self.gen_model.reward_func(state, action) + (self.gamma * self._estimate_v(next_state, horizon-1))
+            total += self.gen_model.reward_func(state, action) + (
+                self.gamma * self._estimate_v(next_state, horizon - 1))
         return total / float(width)
 
     def _estimate_v(self, state, horizon):
@@ -119,9 +123,11 @@ class BeliefSparseSampling(object):
                 return self.nodes_by_horizon[state][horizon]
 
         if self.gen_model.is_in_goal_state():
-            self.nodes_by_horizon[state][horizon] = self.gen_model.reward_func(state, random.choice(self.gen_model.actions))
+            self.nodes_by_horizon[state][horizon] = self.gen_model.reward_func(
+                state, random.choice(self.gen_model.actions))
         else:
-            self.nodes_by_horizon[state][horizon] = np.max(self._estimate_qs(state, horizon))
+            self.nodes_by_horizon[state][horizon] = np.max(
+                self._estimate_qs(state, horizon))
 
         return self.nodes_by_horizon[state][horizon]
 
@@ -152,8 +158,11 @@ class BeliefSparseSampling(object):
             action = self.plan_from_state(state)
             reward, next_state = self.gen_model.execute_agent_action(action)
             policy[state] = action
-            discounted_sum_rewards += ((self.gamma ** num_iter) * reward)
-            if verbose: print('({}, {}, {}) -> {} | {}'.format(state, action, next_state, reward, discounted_sum_rewards))
+            discounted_sum_rewards += ((self.gamma**num_iter) * reward)
+            if verbose:
+                print('({}, {}, {}) -> {} | {}'.format(state, action,
+                                                       next_state, reward,
+                                                       discounted_sum_rewards))
             state = copy.deepcopy(next_state)
             num_iter += 1
         return discounted_sum_rewards, policy

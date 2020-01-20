@@ -23,10 +23,12 @@ class BeliefUpdater(object):
 
         # We use the ValueIteration class to construct the transition and 
         # observation probabilities
-        self.vi = ValueIteration(mdp, sample_rate=500)
+        self.vi = ValueIteration(mdp, sample_rate=100)
 
+        print("Constructing transition matrix")
         self.transition_probs = self.construct_transition_matrix(
             transition_func)
+        print("Constructing observation matrix")
         self.observation_probs = self.construct_observation_matrix(
             observation_func, transition_func)
 
@@ -96,11 +98,10 @@ class BeliefUpdater(object):
             for obs in odict:
                 odict[obs] /= norm_factor
             return odict
-
         obs_dict = defaultdict(lambda: defaultdict(float))
         for state in self.vi.get_states():
             for action in self.vi.mdp.actions:
-                for sample in range(self.vi.sample_rate):
+                for _ in range(self.vi.sample_rate):
                     observation = observation_func(state, action)
                     next_state = transition_func(state, action)
                     obs_dict[next_state][

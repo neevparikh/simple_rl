@@ -8,16 +8,21 @@ from collections import defaultdict
 # Other imports.
 from simple_rl.planning.PlannerClass import Planner
 
-class MCTS(Planner):
 
-    def __init__(self, mdp, name="mcts", explore_param=math.sqrt(2), rollout_depth=20, num_rollouts_per_step=10):
+class MCTS(Planner):
+    def __init__(self,
+                 mdp,
+                 name="mcts",
+                 explore_param=math.sqrt(2),
+                 rollout_depth=20,
+                 num_rollouts_per_step=10):
         Planner.__init__(self, mdp, name=name)
 
         self.rollout_depth = rollout_depth
         self.num_rollouts_per_step = num_rollouts_per_step
-        self.value_total = defaultdict(lambda : defaultdict(float))
+        self.value_total = defaultdict(lambda: defaultdict(float))
         self.explore_param = explore_param
-        self.visitation_counts = defaultdict(lambda : defaultdict(lambda : 0))
+        self.visitation_counts = defaultdict(lambda: defaultdict(lambda: 0))
 
     def plan(self, cur_state, horizon=20):
         '''
@@ -73,7 +78,9 @@ class MCTS(Planner):
 
         if 0 in total_visits:
             # Insufficient stats, return a random action.
-            unsampled_actions = [self.actions[i] for i, x in enumerate(total_visits) if x == 0]
+            unsampled_actions = [
+                self.actions[i] for i, x in enumerate(total_visits) if x == 0
+            ]
             next_action = random.choice(unsampled_actions)
             self.visitation_counts[state][next_action] += 1
             return next_action
@@ -84,7 +91,8 @@ class MCTS(Planner):
         for cur_action in self.actions:
             s_a_value_tot = self.value_total[state][cur_action]
             s_a_visit = self.visitation_counts[state][cur_action]
-            score = s_a_value_tot / s_a_visit + self.explore_param * math.sqrt(math.log(total) / s_a_visit)
+            score = s_a_value_tot / s_a_visit + self.explore_param * math.sqrt(
+                math.log(total) / s_a_visit)
 
             if score > best_score:
                 best_action = cur_action
@@ -125,4 +133,3 @@ class MCTS(Planner):
             self.value_total[s][a] += sum(total_discounted_reward[i:])
 
         return total_discounted_reward
-
